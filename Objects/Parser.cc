@@ -2,6 +2,8 @@
 #include <vector>
 #include <cctype>
 #include <string>
+#include <fstream>
+#include <streambuf>
 #include <algorithm>
 using namespace std;
 
@@ -39,55 +41,86 @@ class Parser{
 
             }
             else{
-                string myText;
                 ifstream File(path);
+                string str((std::istreambuf_iterator<char>(File)),
+                istreambuf_iterator<char>());
+                txt="";
                 if(File){
-                    while (getline (File, myText)) {
-                        cout << myText;
-                    }
-                    File.close();
+                    txt=str;
+
+                    cout<<"este es el texto:"+txt;
+                    Reset();
+                    Parse();
                 }
                 else{
                     cout<<"Direccion invalida"<<endl;
-                }
-                
-                txt=myText;
-                cout<<txt;
-                //Reset();
-                //Parse();      
+                } 
             }
         }
         else{
             errores.push_back("Se esperaba exec y se obtuvo:"+tokens[0]);
         }   
-        getError();
     }
 
     void Parse(){
         Split();
+        getTokens();
+        
         for(index = 0; index < tokens.size() ; index ++)
         {
-            if(tokens.at(index)=="MKDISK"){
+            cout<<tokens[index]<<endl;
+            if(tokens.at(index)=="mkdisk"){
+                Params();
+                if(size==-1){
+                    errores.push_back("La operacion MKDISK neceista el parametro size");
+                    break;
+                }
+                if(f_==""){
+                    f_="ff";
+                }
+                if(u_==""){
+                    u_="m";
+                }
+                if (path == ""){
+                    errores.push_back("La operacion MKDISK neceista el parametro path");
+                    break;
+                }
+                mkdisk();
+                ResetParams();
+                continue;
             }
-            if(tokens.at(index)=="RMDISK"){
+            if(tokens.at(index)=="rmdisk"){
+                continue;
             }
-            if(tokens.at(index)=="FDISK"){
+            if(tokens.at(index)=="fdisk"){
+                continue;
             }
-            if(tokens.at(index)=="MOUNT"){
+            if(tokens.at(index)=="mount"){
+                continue;
             }
-            if(tokens.at(index)=="UNMOUNT"){
+            if(tokens.at(index)=="unmount"){
+                continue;
             }
-            if(tokens.at(index)=="MKFS"){
+            if(tokens.at(index)=="mkfs"){
+                continue;
             }
-
-            cout<<tokens[index]+"|";
-
+            if(tokens.at(index)=="@SALTO"){
+                continue;
+            }
+            else{
+                errores.push_back("Se esperaba MKDISK,RMDISK,FDISK,MOUNT,UNMOUNT o MKFS y se obtuvo:"+tokens[index]);
+                break;
+            } 
         }
+        getError();
     }
     void Params(){
-        while(tokens[index]!="$"){
+        while(true){
+            if(index==tokens.size()-1){
+                break;
+            }
             index++;
-            if(tokens.size()-1==index||tokens.size()==index){
+            if(tokens[index]=="@SALTO"){
                 break;
             }
             if(tokens.at(index)=="size"){
@@ -142,23 +175,26 @@ class Parser{
             }
             else{
                 errores.push_back("Se esperaba parametro completo y se obtuvo:"+tokens[index]);
+                break;
             }
         }
     }
-    
+
+
     void Split(){
         replace(txt.begin(), txt.end(), '\t', ' ');
         replace(txt.begin(), txt.end(), '\r', ' ');
-        replace(txt.begin(), txt.end(), '\n', '$');
         txt.push_back(' ');
 
         for(int i= 0; i<txt.size(); i++){
             txt[i]= tolower(txt[i]);
             linea+=txt[i];
-            if(txt[i]=='$'){
+            if(txt[i]=='\n'){
                 lineas.push_back(linea);
                 Match();
-                tokens.push_back("$");
+                if(tokens[tokens.size()-1]!="@SALTO"){
+                    tokens.push_back("@SALTO");
+                }
                 continue;
             }
             if(txt[i]==' '||txt[i]=='='){
@@ -182,6 +218,7 @@ class Parser{
                     }
                     i++;
                 }
+                i--;
             }
             else{
                 if(txt[i]!='-'){
@@ -197,16 +234,28 @@ class Parser{
         }
         linea="";
     }
+    
+    void mkdisk(){
+        cout<<"Se creara un disco con los siguientes parametros:"+to_string(size) + "|"+f_+ "|"+u_+ "|"+path<<endl;
+    }
+
+
+
     void getTokens(){
         cout<<"==========Lista Tokens ============"<<endl;
         for(int i=0; i<tokens.size();i++){
-            cout<<tokens[i]<<endl;;
+            //if(tokens[i]!="@SALTO"){
+                cout<<tokens[i]<<endl;
+            //}
         }
     }
     void getError(){
         cout<<"==========Lista Errores ============"<<endl;
         for(int i=0; i<errores.size();i++){
             cout<<errores[i]<<endl;
+        }
+        if(errores.size()==0){
+            cout<<"*Sin errores*"<<endl;
         }
     }
     void Reset(){
@@ -230,7 +279,6 @@ class Parser{
         add = -1;
         id ="";
         fs="";
-        txt;
     }
     int getNumError(){
         return errores.size();
