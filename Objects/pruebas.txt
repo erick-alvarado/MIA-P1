@@ -1,0 +1,11 @@
+#Crea un disco de 3000 Kb en la carpeta home
+Mkdisk -Size=3000 –u=K -path=/home/user/Disco1.dk
+#No es necesario utilizar comillas para la ruta en este caso ya
+que la ruta no tiene ningún espacio en blanco
+Mkdisk –path=/home/user/Disco2.dk –U=K –size=3000
+#Se ponen comillas por la carpeta “mis discos” ya que tiene
+espacios en blanco, se crea si no está no existe
+mkdisk –size=5 –u=M –path="/home/mis discos/Disco3.dk"
+#Creará un disco de 10 Mb ya que no hay parámetro
+unit
+Mkdisk –size=10 –path="/home/mis discos/Disco4.dk"
