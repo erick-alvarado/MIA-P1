@@ -47,8 +47,6 @@ class Parser{
                 txt="";
                 if(File){
                     txt=str;
-
-                    cout<<"este es el texto:"+txt;
                     Reset();
                     Parse();
                 }
@@ -82,7 +80,7 @@ class Parser{
                     u_="m";
                 }
                 if (path == ""){
-                    errores.push_back("La operacion MKDISK neceista el parametro path");
+                    errores.push_back("La operacion MKDISK necesita el parametro path");
                     break;
                 }
                 mkdisk();
@@ -90,18 +88,81 @@ class Parser{
                 continue;
             }
             if(tokens.at(index)=="rmdisk"){
+                Params();
+                if (path == ""){
+                    errores.push_back("La operacion rmdisk necesita el parametro path");
+                    break;
+                }
+                rmdisk();
+                ResetParams();
                 continue;
             }
             if(tokens.at(index)=="fdisk"){
+                Params();
+                if(size==-1 && delete_=="" && add==-1){
+                    //OBLIGATORIO AL CREAR
+                    errores.push_back("La operacion fdisk neceista el parametro size");
+                    break;
+                }
+                if(u_==""){
+                    u_="k";
+                }
+                if (path == ""){
+                    errores.push_back("La operacion fdisk necesita el parametro path");
+                    break;
+                }
+                if (type == ""){
+                    type="p";
+                }
+                if(f_==""){
+                    f_="wf";
+                }
+                if (name == ""){
+                    errores.push_back("La operacion fdisk necesita el parametro name");
+                    break;
+                }
+                fdisk();
+                ResetParams();
                 continue;
             }
             if(tokens.at(index)=="mount"){
+                Params();
+                if (path == ""){
+                    errores.push_back("La operacion mount necesita el parametro path");
+                    break;
+                }
+                if (name == ""){
+                    errores.push_back("La operacion mount necesita el parametro name");
+                    break;
+                }
+                mount();
+                ResetParams();
                 continue;
             }
             if(tokens.at(index)=="unmount"){
+                Params();
+                if (id == ""){
+                    errores.push_back("La operacion unmount necesita el parametro id");
+                    break;
+                }
+                unmount();
+                ResetParams();
                 continue;
             }
             if(tokens.at(index)=="mkfs"){
+                Params();
+                if (id == ""){
+                    errores.push_back("La operacion mkfs necesita el parametro id");
+                    break;
+                }
+                if (type == ""){
+                    type="full";
+                }
+                if (fs == ""){
+                    fs="2fs";
+                }
+                mkfs();
+                ResetParams();
                 continue;
             }
             if(tokens.at(index)=="@SALTO"){
@@ -116,6 +177,7 @@ class Parser{
     }
     void Params(){
         while(true){
+            //cout<<"==="+tokens[index]<<endl;
             if(index==tokens.size()-1){
                 break;
             }
@@ -178,6 +240,7 @@ class Parser{
                 break;
             }
         }
+       // cout<<"SALIO DE ESTAAAAAAAAAAAA"<<endl;
     }
 
 
@@ -236,11 +299,24 @@ class Parser{
     }
     
     void mkdisk(){
-        cout<<"Se creara un disco con los siguientes parametros:"+to_string(size) + "|"+f_+ "|"+u_+ "|"+path<<endl;
+        cout<<"Se creara un mkdisk con los siguientes parametros:"+to_string(size) + "|"+f_+ "|"+u_+ "|"+path<<endl;
     }
+    void rmdisk(){
+        cout<<"Se eliminara un rmdisk con los siguientes parametros:"+path;
 
-
-
+    }
+    void fdisk(){
+        cout<<"Se creara un fdisk con los siguientes parametros:"+to_string(size)+ "|" +u_+ "|"+path+ "|"+type+ "|"+f_+ "|"+delete_+ "|"+name+ "|"+to_string(add)<<endl;
+    }
+    void mount(){
+        cout<<"Se creara un mount con los siguientes parametros:"+path+"|"+name<<endl;
+    }
+    void unmount(){
+        cout<<"Se creara un unmount con los siguientes parametros:"+id<<endl;
+    }
+    void mkfs(){
+        cout<<"Se creara un mkfs con los siguientes parametros:"+id+"|"+type+"|"+fs<<endl;
+    }
     void getTokens(){
         cout<<"==========Lista Tokens ============"<<endl;
         for(int i=0; i<tokens.size();i++){
@@ -286,6 +362,21 @@ class Parser{
     void setTxt(string text){
         txt = text;
     }
+    void getParams(){
+        cout<<"========== Params ============"<<endl;
+        cout<<"size:"+to_string(size)<<endl;
+        cout<<"f:"+f_<<endl;
+        cout<<"u:"+u_<<endl;
+        cout<<"path:"+path<<endl;
+        cout<<"type:"+type<<endl;
+        cout<<"delete:"+delete_<<endl;
+        cout<<"name:"+name<<endl;
+        cout<<"add:"+to_string(add)<<endl;
+        cout<<"id:"+id<<endl;
+        cout<<"fs:"+fs<<endl;
 
+
+
+    }
 
 };
