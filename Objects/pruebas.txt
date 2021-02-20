@@ -1,4 +1,1 @@
-#Realiza un formateo rápido de la partición en el id 581A en ext2
-mkfs -type=fast -id=581A
-#Realiza un formateo completo de la partición que ocupa el id 582A
-mkfs -id=582A -fs = 3fss
+Mkdisk -Size=3000 -u=K -path=\Users\alexa\OneDrive\Desktop\Disco1.dk

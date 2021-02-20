@@ -8,6 +8,6 @@ class Partition{
    char part_type;
    char part_fit;
    int part_start;
-   int part_size;
+   int part_size=0;
    char part_name[16];
 };

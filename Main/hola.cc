@@ -2,37 +2,45 @@
 #include <fstream>
 using namespace std;
 #include "../Objects/Parser.cc"
-
-
+#include "../Objects/Disk.cc"
+Parser p;
+string s;
+vector<Instruction> instrucciones;
+Disk disco;
+void Exec(vector<Instruction> ins){
+  for(int i =0; i<ins.size();i++){
+    disco.CrearDisco(ins[i].size,ins[i].f_,ins[i].u_,ins[i].path);  
+  }
+}
 
 int main(){
-  Parser p;
-  string s;
+  
   cout<<"---------------MENU PRINCIPAL---------------"<<endl;
   do{
     cout<<"Ingrese el comando EXEC"<<endl;
     getline(cin,s);
-    vector<Instruction> in =  p.Exec(s);
+    instrucciones =  p.Exec(s);
     
   }while(p.getNumError()>0);
-  
+  if(instrucciones.size()>0){
+    Exec(instrucciones);
+  }
 }
+
 /*
 int getNumeroInodos(int size, int super, int journal, int inodos, int bloque){
   //Size en bytes, multiplicar por 1024 respectivamente
     return ((size-super)/(journal+inodos+(3*bloque)+4));
+    cout<<"--------------------"<<endl;
+      cout<<ins[i].comando<<endl;
+      cout<<ins[i].type<<endl;
+      cout<<ins[i].delete_<<endl;
+      cout<<ins[i].name<<endl;
+      cout<<ins[i].add<<endl;
+      cout<<ins[i].size<<endl;
+      cout<<ins[i].f_<<endl;
+      cout<<ins[i].u_<<endl;
+      cout<<ins[i].path<<endl;
+      cout<<ins[i].id<<endl;
+      cout<<ins[i].fs<<endl;
 }*/
-/*for(int i =0; i<in.size();i++){
-      cout<<"--------------------"<<endl;
-      cout<<in[i].comando<<endl;
-      cout<<in[i].type<<endl;
-      cout<<in[i].delete_<<endl;
-      cout<<in[i].name<<endl;
-      cout<<in[i].add<<endl;
-      cout<<in[i].size<<endl;
-      cout<<in[i].f_<<endl;
-      cout<<in[i].u_<<endl;
-      cout<<in[i].path<<endl;
-      cout<<in[i].id<<endl;
-      cout<<in[i].fs<<endl;
-    }*/
