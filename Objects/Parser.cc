@@ -5,12 +5,14 @@
 #include <fstream>
 #include <streambuf>
 #include <algorithm>
+#include "Instruction.cc"
 using namespace std;
 
 class Parser{
     vector<string> tokens;
     vector<string> errores;
     vector<string> lineas;
+    vector<Instruction> instrucciones;
     int index = 0;
     string cadena="";
     string linea="";
@@ -29,9 +31,9 @@ class Parser{
     string txt;
 
   public:
-    
-    
-    void Exec(){
+    vector<Instruction> Exec(string texto){
+        Reset();
+        txt=texto;
         Split();
         getTokens();
         if(tokens.size()>0 && tokens[0]=="exec"){
@@ -57,7 +59,8 @@ class Parser{
         }
         else{
             errores.push_back("Se esperaba exec y se obtuvo:"+tokens[0]);
-        }   
+        }  
+        return instrucciones;
     }
 
     void Parse(){
@@ -70,7 +73,7 @@ class Parser{
             if(tokens.at(index)=="mkdisk"){
                 Params();
                 if(size==-1){
-                    errores.push_back("La operacion MKDISK neceista el parametro size");
+                    errores.push_back("MKDISK: falta size");
                     break;
                 }
                 if(f_==""){
@@ -80,7 +83,7 @@ class Parser{
                     u_="m";
                 }
                 if (path == ""){
-                    errores.push_back("La operacion MKDISK necesita el parametro path");
+                    errores.push_back("MKDISK: falta path");
                     break;
                 }
                 mkdisk();
@@ -90,7 +93,7 @@ class Parser{
             if(tokens.at(index)=="rmdisk"){
                 Params();
                 if (path == ""){
-                    errores.push_back("La operacion rmdisk necesita el parametro path");
+                    errores.push_back("RMDISK: falta path");
                     break;
                 }
                 rmdisk();
@@ -101,14 +104,14 @@ class Parser{
                 Params();
                 if(size==-1 && delete_=="" && add==-1){
                     //OBLIGATORIO AL CREAR
-                    errores.push_back("La operacion fdisk neceista el parametro size");
+                    errores.push_back("FDISK: falta size");
                     break;
                 }
                 if(u_==""){
                     u_="k";
                 }
                 if (path == ""){
-                    errores.push_back("La operacion fdisk necesita el parametro path");
+                    errores.push_back("FDISK: falta path");
                     break;
                 }
                 if (type == ""){
@@ -118,7 +121,7 @@ class Parser{
                     f_="wf";
                 }
                 if (name == ""){
-                    errores.push_back("La operacion fdisk necesita el parametro name");
+                    errores.push_back("FDISK: falta name");
                     break;
                 }
                 fdisk();
@@ -128,11 +131,11 @@ class Parser{
             if(tokens.at(index)=="mount"){
                 Params();
                 if (path == ""){
-                    errores.push_back("La operacion mount necesita el parametro path");
+                    errores.push_back("MOUNT: falta path");
                     break;
                 }
                 if (name == ""){
-                    errores.push_back("La operacion mount necesita el parametro name");
+                    errores.push_back("MOUNT: falta name");
                     break;
                 }
                 mount();
@@ -142,7 +145,7 @@ class Parser{
             if(tokens.at(index)=="unmount"){
                 Params();
                 if (id == ""){
-                    errores.push_back("La operacion unmount necesita el parametro id");
+                    errores.push_back("UNMOUNT: falta id");
                     break;
                 }
                 unmount();
@@ -152,7 +155,7 @@ class Parser{
             if(tokens.at(index)=="mkfs"){
                 Params();
                 if (id == ""){
-                    errores.push_back("La operacion mkfs necesita el parametro id");
+                    errores.push_back("MKFS: falta id");
                     break;
                 }
                 if (type == ""){
@@ -243,7 +246,6 @@ class Parser{
        // cout<<"SALIO DE ESTAAAAAAAAAAAA"<<endl;
     }
 
-
     void Split(){
         replace(txt.begin(), txt.end(), '\t', ' ');
         replace(txt.begin(), txt.end(), '\r', ' ');
@@ -299,24 +301,89 @@ class Parser{
     }
     
     void mkdisk(){
-        cout<<"Se creara un mkdisk con los siguientes parametros:"+to_string(size) + "|"+f_+ "|"+u_+ "|"+path<<endl;
+        if(f_!="bf"&&f_!="ff"&& f_!="wf"){
+            errores.push_back("MKDISK: valor de f incorrecto->"+f_);
+        }
+        if(u_!="m"&&u_!="k"){
+            errores.push_back("MKDISK: valor de u incorrecto->"+u_);
+        }
+        if(errores.size()==0){
+            Instruction ins;
+            ins.comando="mkdisk";
+            ins.size=size;
+            ins.f_=f_;
+            ins.u_=u_;
+            ins.path=path;
+            instrucciones.push_back(ins);
+        }
+        //errores.push_back("La operacion MKDISK neceista el parametro size");
     }
     void rmdisk(){
-        cout<<"Se eliminara un rmdisk con los siguientes parametros:"+path;
+        Instruction ins;
+        ins.comando="rmdisk";
+        ins.path = path;
+        instrucciones.push_back(ins);
 
     }
     void fdisk(){
-        cout<<"Se creara un fdisk con los siguientes parametros:"+to_string(size)+ "|" +u_+ "|"+path+ "|"+type+ "|"+f_+ "|"+delete_+ "|"+name+ "|"+to_string(add)<<endl;
+    
+        if(f_!="bf"&&f_!="ff"&& f_!="wf"){
+            errores.push_back("FDISK: valor de f incorrecto->"+f_);
+        }
+        if(u_!="m"&& u_!="k"&&u_!="b"){
+            errores.push_back("FDISK: valor de u incorrecto->"+u_);
+        }
+        if(type!="p"&&type!="e"&&type!="l"){
+            errores.push_back("FDISK: valor de type incorrecto->"+type);
+        }
+        if(delete_!="fast"&&delete_!="full"&&size==-1&&add==-1){
+            errores.push_back("FDISK: valor de delete incorrecto->"+delete_);
+        }
+        if(errores.size()==0){
+            Instruction ins;
+            ins.comando="fdisk";
+            ins.size=size;
+            ins.u_=u_;
+            ins.path=path;
+            ins.type=type;
+            ins.f_=f_;
+            ins.delete_=delete_;
+            ins.name=name;
+            ins.add=add;
+            instrucciones.push_back(ins);
+        }
     }
     void mount(){
-        cout<<"Se creara un mount con los siguientes parametros:"+path+"|"+name<<endl;
+        Instruction ins;
+        ins.comando = "mount";
+        ins.path = path;
+        ins.name = name;
+        instrucciones.push_back(ins);
     }
     void unmount(){
-        cout<<"Se creara un unmount con los siguientes parametros:"+id<<endl;
+        Instruction ins;
+        ins.comando = "unmount";
+        ins.id = id;
+        instrucciones.push_back(ins);
     }
     void mkfs(){
-        cout<<"Se creara un mkfs con los siguientes parametros:"+id+"|"+type+"|"+fs<<endl;
+        
+        if(fs!="2fs"&&fs!="3fs"){
+            errores.push_back("MKFS: valor de fs incorrecto->"+fs);
+        }
+        if(type!="fast"&&type!="full"){
+            errores.push_back("MKFS: valor de type incorrecto->"+type);
+        }
+        if(errores.size()==0){
+            Instruction ins;
+            ins.comando="mkfs";
+            ins.id=id;
+            ins.type=type;
+            ins.fs=fs;
+            instrucciones.push_back(ins);
+        }
     }
+
     void getTokens(){
         cout<<"==========Lista Tokens ============"<<endl;
         for(int i=0; i<tokens.size();i++){
@@ -338,6 +405,7 @@ class Parser{
         tokens.clear();
         errores.clear();
         lineas.clear();
+        instrucciones.clear();
         index = 0;
         cadena="";
         linea="";
