@@ -5,7 +5,7 @@ using namespace std;
 
 class Mbr{
   public:
-    int mbr_tamano;
+    int mbr_tamano=0;
     time_t mbr_fecha_creacion;
     int mbr_disk_signature;
     char disk_fit;

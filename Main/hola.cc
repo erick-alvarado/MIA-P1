@@ -8,9 +8,19 @@ string s;
 vector<Instruction> instrucciones;
 Disk disco;
 void Exec(vector<Instruction> ins){
+  Mbr b ;
   for(int i =0; i<ins.size();i++){
-    disco.CrearDisco(ins[i].size,ins[i].f_,ins[i].u_,ins[i].path);  
+    disco.CreateDisk(ins[i].size,ins[i].f_,ins[i].u_,ins[i].path);  
+    b = disco.getMbr(ins[i].path);
   }
+  if(b.mbr_tamano!=0){
+    cout<<b.disk_fit<<endl;
+    cout<<b.mbr_disk_signature<<endl;
+    cout<<b.mbr_fecha_creacion<<endl;
+    cout<<b.mbr_tamano<<endl;
+  
+  }
+  
 }
 
 int main(){

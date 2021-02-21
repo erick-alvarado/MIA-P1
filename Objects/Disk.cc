@@ -10,17 +10,15 @@ using namespace std;
 
 class Disk{
     int disk_signature=0;
+    int mbr_size=136;
   public:
-    void CrearDisco(int size, string f, string u,string path){
+    void CreateDisk(int size, string f, string u,string path){
         int size_=1024;
         if(u=="m"){
             size_=1024*1024;
         }
         size_=size_*size;
-
-        //write object into the file
-        fstream file=getFile(path);
-        
+        fstream file=getFile_toWrite(path);
         if (!file){
             cout << "Error al crear el archivo:"+path<<endl;
             return;
@@ -41,41 +39,62 @@ class Disk{
         mbr.mbr_partition_2=p2;
         mbr.mbr_partition_3=p3;
         mbr.mbr_partition_4=p4;
-
         file.write((char *)&mbr, sizeof(mbr));
         file.close();
+        resetFile(path,sizeof(mbr),size_-sizeof(mbr));
         cout << "Archivo creado:"+path<<endl;
-        /*
-        //open file again
-        file.open(FILE_NAME, ios::in | ios::binary);
-        if (!file)
-        {
-            cout << "Error in opening file...\n";
-            return -1;
+        
+       
+    }
+
+    Mbr getMbr(string path){
+        Mbr mbr;
+        fstream file = getFile_toRead(path);
+        if (!file){
+            cout << "Error al abrir el archivo:"+path<<endl;
+            return mbr;
         }
 
-        if (file.read((char *)&emp, sizeof(emp)))
-        {
+        if (file.read((char *)&mbr, sizeof(mbr))){
             cout << endl
                  << endl;
-            cout << "Data extracted from file..\n";
-            //print the object
-            emp.displayEmployee();
+            cout << "Archivo cargado:"+path<<endl;
         }
-        else
-        {
-            cout << "Error in reading data from file...\n";
-            return -1;
+        else{
+            cout << "Error al abrir el archivo:"+path<<endl;
+            return mbr;
         }
 
         file.close();
-        return 0;*/
+        return mbr;
     }
-	fstream getFile(string path){
+
+	fstream getFile_toWrite(string path){
         fstream file;
-        file.open(path, ios::out | ios::binary);
+        file.open(path,  ios::app|ios::out |ios::binary);
         return file;
-        
+    }
+    fstream getFile_toRead(string path){
+        fstream file;
+        file.open(path, ios::in |ios::binary);
+        return file;
+    }
+    
+    void resetFile(string path, int inicio, int fin){
+        fstream file= getFile_toWrite(path);
+        file.seekp(inicio);
+        int t = file.tellg();
+        cout<<t<<endl;
+        cout<<"path:"+path<<endl;
+        cout<<"inicio:"+to_string(inicio)<<endl;
+        cout<<"size fin:"+to_string(fin)<<endl;
+        for (int i = 0; i < fin; ++i){
+            char zero = 0;
+            file.write(&zero, sizeof(char));
+        }
+        t = file.tellg();
+        cout<<t<<endl;
+        file.close();
     }
 	
 };
