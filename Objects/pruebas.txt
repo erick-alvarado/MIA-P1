@@ -1,1 +1,2 @@
 Mkdisk -Size=3000 -u=K -path=\Users\alexa\OneDrive\Desktop\Disco1.dk
+RmDiSk -path=\Users\alexa\OneDrive\Desktop\Disco1.dk

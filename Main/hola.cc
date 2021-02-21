@@ -7,19 +7,23 @@ Parser p;
 string s;
 vector<Instruction> instrucciones;
 Disk disco;
+vector<Mbr> mounts;
 void Exec(vector<Instruction> ins){
-  Mbr b ;
   for(int i =0; i<ins.size();i++){
-    disco.CreateDisk(ins[i].size,ins[i].f_,ins[i].u_,ins[i].path);  
-    b = disco.getMbr(ins[i].path);
+    if(ins[i].comando=="mkdisk"){
+      disco.CreateDisk(ins[i].size,ins[i].f_,ins[i].u_,ins[i].path);  
+      continue;
+    }
+    if(ins[i].comando=="rmdisk"){
+      disco.DeleteDisk(ins[i].path);
+      continue;
+    }
+    if(ins[i].comando=="mount"){
+      mounts.push_back(disco.getMbr(ins[i].path));  
+      continue;
+    }
   }
-  if(b.mbr_tamano!=0){
-    cout<<b.disk_fit<<endl;
-    cout<<b.mbr_disk_signature<<endl;
-    cout<<b.mbr_fecha_creacion<<endl;
-    cout<<b.mbr_tamano<<endl;
   
-  }
   
 }
 
@@ -53,4 +57,16 @@ int getNumeroInodos(int size, int super, int journal, int inodos, int bloque){
       cout<<ins[i].path<<endl;
       cout<<ins[i].id<<endl;
       cout<<ins[i].fs<<endl;
-}*/
+}
+
+
+
+if(b.mbr_tamano!=0){
+    cout<<b.disk_fit<<endl;
+    cout<<b.mbr_disk_signature<<endl;
+    cout<<b.mbr_fecha_creacion<<endl;
+    cout<<b.mbr_tamano<<endl;
+  }
+  
+  
+  */

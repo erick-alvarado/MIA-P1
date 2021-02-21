@@ -46,7 +46,15 @@ class Disk{
         
        
     }
-
+    
+    void DeleteDisk(string path){
+        if (remove( path.c_str() ) != 0){
+            cout<<"Error al borrar el archivo:"+path<<endl;
+        }
+        else{
+            cout<<"Archivo eliminado:"+path<<endl;
+        }
+    }
     Mbr getMbr(string path){
         Mbr mbr;
         fstream file = getFile_toRead(path);
@@ -79,7 +87,7 @@ class Disk{
         file.open(path, ios::in |ios::binary);
         return file;
     }
-    
+
     void resetFile(string path, int inicio, int fin){
         fstream file= getFile_toWrite(path);
         file.seekp(inicio);
