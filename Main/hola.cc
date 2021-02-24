@@ -11,7 +11,19 @@ vector<Mbr> mounts;
 void Exec(vector<Instruction> ins){
   for(int i =0; i<ins.size();i++){
     if(ins[i].comando=="mkdisk"){
-      disco.CreateDisk(ins[i].size,ins[i].f_,ins[i].u_,ins[i].path);  
+      disco.CreateDisk(ins[i].size,ins[i].f_,ins[i].u_,ins[i].path);
+      continue;
+    }
+    if(ins[i].comando=="fdisk"){
+      disco.CreatePartition(ins[i].size,ins[i].u_,ins[i].path,ins[i].type,ins[i].f_,ins[i].delete_,ins[i].name,ins[i].add);
+      cout<<"--------------------"<<endl;
+      Mbr m = disco.getMbr(ins[i].path);
+      cout<<m.particiones[0].part_name<<endl;
+      cout<<m.particiones[0].part_fit<<endl;
+      cout<<m.particiones[0].part_size<<endl;
+      cout<<m.particiones[0].part_start<<endl;
+      cout<<m.particiones[0].part_status<<endl;
+      cout<<m.particiones[0].part_type<<endl;
       continue;
     }
     if(ins[i].comando=="rmdisk"){
@@ -39,6 +51,7 @@ int main(){
   if(instrucciones.size()>0){
     Exec(instrucciones);
   }
+
 }
 
 /*

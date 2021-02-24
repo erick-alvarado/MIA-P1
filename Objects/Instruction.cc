@@ -9,9 +9,9 @@ class Instruction {       // The class
     string u_;
     string path;
     string type;
-    string delete_;
+    string delete_="";
     string name;
-    int add;
+    int add=0;
     string id;
     string fs;
     string txt;
