@@ -37,11 +37,11 @@ class Disk{
         mbr.particiones[1]=p2;
         mbr.particiones[2]=p3;
         mbr.particiones[3]=p4;
-        writeMbr(path,mbr);
-        resetFile(path,sizeof(mbr),size_-sizeof(mbr));
-        cout << "Archivo creado:"+path<<endl;
-        
-       
+        if(createFile(path)){
+            writeMbr(path,mbr);
+            resetFile(path,sizeof(mbr),size_-sizeof(mbr));
+            cout << "Archivo creado:"+path<<endl;
+        }
     }
     
     void DeleteDisk(string path){
@@ -59,7 +59,11 @@ class Disk{
             return;
         }
         if(delete_!=""){
-            cout<<"Eliminando particion"<<endl;
+            cout<<delete_<<endl;
+            mbr
+            if(delete_=="full"){
+
+            }
             //Eliminar particion
             return;
         }
@@ -98,28 +102,70 @@ class Disk{
         p.part_size=size;
         
         strcpy (p.part_name, name.c_str());
+        
         selectPartition(mbr,p);
         writeMbr(path,mbr);
         
     }
 
-    //Metidis oara obtener y escribir MBRs
+    
+    
+    //Metodos para resetear y abrir archivos
+	void getFile_toWrite(fstream& file,string path){
+        file.open(path,  ios::in |ios::out |ios::binary);
+    }
+    void getFile_toRead(fstream& file,string path){
+        file.open(path, ios::in |ios::binary);
+    }
+    bool createFile(string path){
+        fstream f;
+        getFile_toRead(f,path);
+        if(f){
+            cout<<"Este disco ya existe:"+path<<endl;
+            return false;
+        }
+        ofstream file(path);
+        if (!file){
+            cout << "Error al crear el archivo:"+path<<endl;
+            return false;
+        }
+        cout<<"Se creo el archivo:"+path<<endl;
+        file.close();
+        return true;
+    }
+    void resetFile(string path, int inicio, int fin){
+        fstream file;
+        getFile_toWrite(file,path);
+        if(!file){
+            cout<<"Error al abrir el archivo:"+path<<endl;
+        }
+        file.seekp(inicio);
+        //int t = file.tellg();
+        for (int i = 0; i < fin; ++i){
+            char zero = 0;
+            file.write(&zero, sizeof(char));
+        }
+        //t = file.tellg();
+        file.close();
+    }
+    
+    //Metodos para obtener y escribir MBRs esto deberia ir en mbr pero sepa si se puede
     Mbr getMbr(string path){
         Mbr mbr;
         fstream file;
         getFile_toRead(file,path);
         if (!file){
-            cout << "Error al abrir el disco:"+path<<endl;
+            cout << "Error al abrir el mbr:"+path<<endl;
             return mbr;
         }
 
         if (file.read((char *)&mbr, sizeof(mbr))){
             cout << endl
                  << endl;
-            cout << "Disco cargado:"+path<<endl;
+            cout << "Mbr cargado:"+path<<endl;
         }
         else{
-            cout << "Error al abrir el disco:"+path<<endl;
+            cout << "Error al abrir el mbr:"+path<<endl;
             return mbr;
         }
 
@@ -130,7 +176,7 @@ class Disk{
         fstream file;
         getFile_toWrite(file,path);
         if (!file){
-            cout << "Error al crear el archivo:"+path<<endl;
+            cout << "Error al crear el mbr:"+path<<endl;
             return;
         }
         file.seekp(0);
@@ -157,58 +203,54 @@ class Disk{
         }
         cout<<"No se puede almacenar la particion:"+string(p.part_name)+" ya que el disco ya posee 4 particiones"<<endl;
     }
-    //Metodos para resetear y abrir archivos
-	void getFile_toWrite(fstream& file,string path){
-        file.open(path,  ios::in |ios::out |ios::binary);
-    }
-    void getFile_toRead(fstream& file,string path){
-        file.open(path, ios::in |ios::binary);
-    }
-    void resetFile(string path, int inicio, int fin){
-        fstream file;
-        getFile_toWrite(file,path);
-        if(!file){
-            cout<<"Error al abrir el archivo:"+path<<endl;
-        }
-        file.seekp(inicio);
-        //int t = file.tellg();
-        for (int i = 0; i < fin; ++i){
-            char zero = 0;
-            file.write(&zero, sizeof(char));
-        }
-        //t = file.tellg();
-        file.close();
-    }
-
+    
     //Metodos para obtener espacios y organizar las particiones
     Partition* Sort(Partition particiones[4]){
         sort(particiones, particiones + 4, [](Partition const & a, Partition const & b) -> bool{ return a.part_start > b.part_start; } );
         return particiones;
     };
     vector<Space> getSpaces(int mbr_tamano, Partition particiones[4],int size){
-      vector<Space> spaces;
-      Space temp;
-      int space = particiones[0].part_start;
-      if(space>=size){
-        temp.start=0;
-        temp.size=space;
-        spaces.push_back(temp);
-      }
-      for(int i = 0; i<3; i++){
-        space = particiones[i+1].part_start-particiones[i].part_start-particiones[i].part_size;
-        if(space>=size){
-            temp.size=space;
-            temp.start = particiones[i].part_start+particiones[i].part_size;
-            spaces.push_back(temp);
+        vector<Space> spaces;
+        vector<Partition> v;
+        Space temp;
+        int space;
+     
+        for(int i = 0; i<3; i++){
+            if(particiones[i].part_status=='o'){
+                v.push_back(particiones[i]);
+            }
         }
-      }
-      space = mbr_tamano-particiones[3].part_start+particiones[3].part_size;
-      if(space>=size){
-          temp.size=size;
-          temp.start = particiones[3].part_start+particiones[3].part_size;
-          spaces.push_back(temp);
-      }
-      return spaces;
+        if(v.size()>0){
+            space = particiones[0].part_start;
+            if(space>=size){
+                temp.start=0;
+                temp.size=space;
+                spaces.push_back(temp);
+            }
+            for(int i = 0; i<3; i++){
+                space = particiones[i+1].part_start-particiones[i].part_start-particiones[i].part_size;
+                if(space>=size){
+                    temp.size=space;
+                    temp.start = particiones[i].part_start+particiones[i].part_size;
+                    spaces.push_back(temp);
+                }
+            }
+            space=mbr_tamano-v[v.size()-1].part_start-v[v.size()-1].part_size;
+            if(space>=size){
+                temp.size=space;
+                temp.start= v[v.size()-1].part_start+v[v.size()-1].part_size;
+                spaces.push_back(temp);
+            }
+        }
+        else{
+            space = mbr_tamano;
+            if(space>=size){
+                temp.size=space;
+                temp.start=0;
+                spaces.push_back(temp);
+            }
+        }
+        return spaces;
     }
 	
 };

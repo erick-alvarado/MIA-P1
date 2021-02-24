@@ -1,2 +1,7 @@
+Mkdisk -Size=3000 -u=K -path=\Users\alexa\OneDrive\Desktop\Disco.dk
 Mkdisk -Size=3000 -u=K -path=\Users\alexa\OneDrive\Desktop\Disco1.dk
-fdisk -Size=300 -path=\Users\alexa\OneDrive\Desktop\Disco1.dk -name=Particion1 
+
+fdisk -Size=5 -path=\Users\alexa\OneDrive\Desktop\Disco1.dk -name=Particion1 
+fdisk -Size=10 -path=\Users\alexa\OneDrive\Desktop\Disco1.dk -name=Particion2
+fdisk -Size=15 -path=\Users\alexa\OneDrive\Desktop\Disco1.dk -name=Particion3 
+fdisk -Size=20 -path=\Users\alexa\OneDrive\Desktop\Disco1.dk -name=Particion4 
