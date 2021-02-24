@@ -55,16 +55,21 @@ class Disk{
     
     void CreatePartition(int size, string u, string path, string type, string f, string delete_, string name, int add){
         Mbr mbr = getMbr(path);
+        Partition temp;
         if(mbr.mbr_tamano==0){
             return;
         }
         if(delete_!=""){
             cout<<delete_<<endl;
-            mbr
-            if(delete_=="full"){
-
+            Partition& p = verifyPartition(name,mbr,temp);
+            if(p.part_size!=0){
+                cout<<"Se elimino la particion:"+name<<endl;
+                if(delete_=="full"){
+                    resetFile(path,p.part_start,p.part_size);
+                }
+                p = temp;
+                writeMbr(path,mbr);
             }
-            //Eliminar particion
             return;
         }
         if(add!=-1){
@@ -203,7 +208,22 @@ class Disk{
         }
         cout<<"No se puede almacenar la particion:"+string(p.part_name)+" ya que el disco ya posee 4 particiones"<<endl;
     }
-    
+    Partition& verifyPartition(string name, Mbr &mbr, Partition &temp){
+        if(mbr.particiones[0].part_name==name){
+            return mbr.particiones[0];
+        }
+        if(mbr.particiones[1].part_name==name){
+            return mbr.particiones[1];
+        }
+        if(mbr.particiones[2].part_name==name){
+            return mbr.particiones[2];
+        }
+        if(mbr.particiones[3].part_name==name){
+            return mbr.particiones[3];
+        }
+        cout<<"No se puede eliminar la particion:"+name+" ya que no existe"<<endl;
+        return temp;
+    }
     //Metodos para obtener espacios y organizar las particiones
     Partition* Sort(Partition particiones[4]){
         sort(particiones, particiones + 4, [](Partition const & a, Partition const & b) -> bool{ return a.part_start > b.part_start; } );
