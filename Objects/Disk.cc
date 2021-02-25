@@ -59,31 +59,64 @@ class Disk{
         if(mbr.mbr_tamano==0){
             return;
         }
-        if(delete_!=""){
-            cout<<delete_<<endl;
-            Partition& p = verifyPartition(name,mbr,temp);
-            if(p.part_size!=0){
-                cout<<"Se elimino la particion:"+name<<endl;
-                if(delete_=="full"){
-                    resetFile(path,p.part_start,p.part_size);
-                }
-                p = temp;
-                writeMbr(path,mbr);
-            }
-            return;
-        }
-        if(add!=-1){
-            cout<<"Anadiendo particion"<<endl;
-
-            //Añadir particion
-            return;
-        }
         if(u=="k"){
             size = size*1024;
         }
         if(u=="m"){
             size = size*1024*1024;
         }
+        if(delete_!=""){
+            Partition& p = verifyPartition(name,mbr,temp);
+            if(p.part_size!=0){
+                if(delete_=="full"){
+                    resetFile(path,p.part_start,p.part_size);
+                }
+                p = temp;
+                cout<<"Se elimino la particion:"+name<<endl;
+                writeMbr(path,mbr);
+            }
+            return;
+        }
+        if(add!=-1){
+            if(u=="k"){
+                add = add*1024;
+            }
+            if(u=="m"){
+                add = add*1024*1024;
+            }
+            cout<<to_string(add)<<endl;
+            Partition& p = verifyPartition(name,mbr,temp);
+            if(p.part_size!=0){
+                if(add>=0){
+                    vector<Space> v = getSpaces(mbr.mbr_tamano,mbr.particiones,add);
+                    if(v.size()>0){
+                        Space sp = getSpace(v,p.part_start+p.part_size);
+                        if(sp.start!=-1){
+                            p.part_size+=add;
+                            cout<<"Se agrego a la particion "+name+": "+to_string(add)<<endl;
+                            writeMbr(path,mbr);
+                            return;
+                        }
+                        
+                    }
+                    cout<<"No existe espacio para agregarle a la particion:"+name<<endl;
+                    return;
+                }
+                else{
+                    if(p.part_size+add>0){
+                        p.part_size=p.part_size+add;
+                        writeMbr(path,mbr);
+                        cout<<"Se quito a la particion "+name+": "+to_string(add)<<endl;
+                        return;
+                    }
+                    cout<<"No se puede restar espacio a la particion:"+name<<endl;
+                    return;
+                }
+            }
+            cout<<"No existe la particion:"+name<<endl;
+            return;
+        }
+        
         Partition p;
         vector<Space> sp = getSpaces(mbr.mbr_tamano,mbr.particiones,size);
         if(sp.size()==0){
@@ -272,5 +305,14 @@ class Disk{
         }
         return spaces;
     }
-	
+	Space getSpace(vector<Space> spaces,int start){
+        for(int i=0; i<spaces.size();i++){
+            if(spaces[i].start==start){
+                return spaces[i];
+            }
+        }
+        Space p;
+        p.start=-1;
+        return p;
+    }
 };

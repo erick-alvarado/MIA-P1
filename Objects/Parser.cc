@@ -289,6 +289,9 @@ class Parser{
                 if(txt[i]!='-'){
                     cadena+=txt[i];
                 }
+                if((txt[i]=='-'&&txt[i-1]=='=')||(txt[i]=='-'&&txt[i-2]=='=')){
+                    cadena+=txt[i];
+                }
             }
         }
     }
