@@ -26,9 +26,7 @@ class Disk{
         mbr.mbr_tamano=size_;
         mbr.mbr_fecha_creacion=time(0);
         mbr.mbr_disk_signature= disk_signature;
-        char c[1];
-        strcpy(c , f.c_str()); 
-        mbr.disk_fit=c[0];
+        mbr.disk_fit=f[0];
         Partition p1;
         Partition p2;
         Partition p3;
