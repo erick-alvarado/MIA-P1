@@ -11,9 +11,9 @@
             "program": "${fileDirname}\\${fileBasenameNoExtension}.exe",
             "args": [],
             "stopAtEntry": false,
-            "cwd": "C:\\w64devkit\\bin",
+            "cwd": "${fileDirname}",
             "environment": [],
-            "console": "externalTerminal",
+            "externalConsole": false,
             "MIMode": "gdb",
             "miDebuggerPath": "C:\\w64devkit\\bin\\gdb.exe",
             "setupCommands": [
