@@ -1,0 +1,2 @@
+Acceder a la carpeta desde ubuntu
+cd mnt/c/Users/alexa/OneDrive/Desktop/MIA-P1/Main

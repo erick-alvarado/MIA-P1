@@ -50,7 +50,7 @@ class Parser{
                 if(File){
                     txt=str;
                     Reset();
-                    Parse();
+                    //Parse();
                 }
                 else{
                     cout<<"Direccion invalida"<<endl;
@@ -63,13 +63,35 @@ class Parser{
         return instrucciones;
     }
 
-    void Parse(){
+    vector<Instruction> Parse(string text){
+        txt = text;
         Split();
-        getTokens();
         
         for(index = 0; index < tokens.size() ; index ++)
         {
             cout<<tokens[index]<<endl;
+            ToLower(tokens[index]);
+            if(tokens.at(index)=="exec"){
+                Params();
+                if(path==""){
+                    errores.push_back("EXEC: falta path");
+                    break;
+                }
+                cout<<path;
+                ifstream File(path);
+                string str((std::istreambuf_iterator<char>(File)),
+                           istreambuf_iterator<char>());
+                txt = "";
+                if (File)
+                {
+                    txt = str;
+                    Parse(txt);
+                }
+                else
+                {
+                    cout << "Direccion invalida" << endl;
+                }
+            }
             if(tokens.at(index)=="mkdisk"){
                 Params();
                 if(size==-1){
@@ -87,7 +109,6 @@ class Parser{
                     break;
                 }
                 mkdisk();
-                ResetParams();
                 continue;
             }
             if(tokens.at(index)=="rmdisk"){
@@ -97,7 +118,6 @@ class Parser{
                     break;
                 }
                 rmdisk();
-                ResetParams();
                 continue;
             }
             if(tokens.at(index)=="fdisk"){
@@ -125,7 +145,6 @@ class Parser{
                     break;
                 }
                 fdisk();
-                ResetParams();
                 continue;
             }
             if(tokens.at(index)=="mount"){
@@ -139,7 +158,6 @@ class Parser{
                     break;
                 }
                 mount();
-                ResetParams();
                 continue;
             }
             if(tokens.at(index)=="unmount"){
@@ -149,7 +167,6 @@ class Parser{
                     break;
                 }
                 unmount();
-                ResetParams();
                 continue;
             }
             if(tokens.at(index)=="mkfs"){
@@ -165,18 +182,21 @@ class Parser{
                     fs="2fs";
                 }
                 mkfs();
-                ResetParams();
+                
                 continue;
             }
-            if(tokens.at(index)=="@SALTO"){
+            if(tokens.at(index)=="@salto"){
                 continue;
             }
             else{
                 errores.push_back("Se esperaba MKDISK,RMDISK,FDISK,MOUNT,UNMOUNT o MKFS y se obtuvo:"+tokens[index]);
                 break;
             } 
+            ResetParams();
         }
         getError();
+
+        return instrucciones;
     }
     void Params(){
         while(true){
@@ -185,7 +205,8 @@ class Parser{
                 break;
             }
             index++;
-            if(tokens[index]=="@SALTO"){
+            ToLower(tokens[index]);
+            if(tokens[index]=="@salto"){
                 break;
             }
             if(tokens.at(index)=="size"){
@@ -252,7 +273,6 @@ class Parser{
         txt.push_back(' ');
 
         for(int i= 0; i<txt.size(); i++){
-            txt[i]= tolower(txt[i]);
             linea+=txt[i];
             if(txt[i]=='\n'){
                 lineas.push_back(linea);
@@ -449,5 +469,9 @@ class Parser{
 
 
     }
-
+    void ToLower(string &txt){
+        for_each(txt.begin(), txt.end(), [](char & c) {
+                c = ::tolower(c);
+        });
+    }
 };

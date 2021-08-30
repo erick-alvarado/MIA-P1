@@ -39,8 +39,27 @@ void Exec(vector<Instruction> ins){
   
 }
 
-int main(){
+int main(int argc, char *argv[]){
+
+  //Get args
+  for(int i = 1; i < argc ; i++){
+    if(argv[i][0]=='.'){
+      s+= argv[i];
+    }
+    else{
+      s+=" ";
+      s+=argv[i];
+    }
+  }
+  cout<<s;
+  //Parse
+  instrucciones = p.Parse(s);
   
+  if(instrucciones.size()>0){
+    Exec(instrucciones);
+  }
+
+  /*
   cout<<"---------------MENU PRINCIPAL---------------"<<endl;
   do{
     cout<<"Ingrese el comando EXEC"<<endl;
@@ -50,7 +69,7 @@ int main(){
   }while(p.getNumError()>0);
   if(instrucciones.size()>0){
     Exec(instrucciones);
-  }
+  }*/
 
 }
 
