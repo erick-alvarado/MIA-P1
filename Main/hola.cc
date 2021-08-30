@@ -51,7 +51,7 @@ int main(int argc, char *argv[]){
       s+=argv[i];
     }
   }
-  cout<<s;
+  s="exec -path= \\Users\\alexa\\OneDrive\\Desktop\\pruebas.txt";
   //Parse
   instrucciones = p.Parse(s);
   

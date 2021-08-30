@@ -31,37 +31,6 @@ class Parser{
     string txt;
 
   public:
-    vector<Instruction> Exec(string texto){
-        Reset();
-        txt=texto;
-        Split();
-        getTokens();
-        if(tokens.size()>0 && tokens[0]=="exec"){
-            Params();
-            if(path==""){
-                errores.push_back("Para ejecutar exec se necesita el parametro path completo");
-
-            }
-            else{
-                ifstream File(path);
-                string str((std::istreambuf_iterator<char>(File)),
-                istreambuf_iterator<char>());
-                txt="";
-                if(File){
-                    txt=str;
-                    Reset();
-                    //Parse();
-                }
-                else{
-                    cout<<"Direccion invalida"<<endl;
-                } 
-            }
-        }
-        else{
-            errores.push_back("Se esperaba exec y se obtuvo:"+tokens[0]);
-        }  
-        return instrucciones;
-    }
 
     vector<Instruction> Parse(string text){
         txt = text;
@@ -77,7 +46,6 @@ class Parser{
                     errores.push_back("EXEC: falta path");
                     break;
                 }
-                cout<<path;
                 ifstream File(path);
                 string str((std::istreambuf_iterator<char>(File)),
                            istreambuf_iterator<char>());
@@ -85,7 +53,9 @@ class Parser{
                 if (File)
                 {
                     txt = str;
+                    Reset();
                     Parse(txt);
+                    break;
                 }
                 else
                 {
@@ -209,6 +179,8 @@ class Parser{
             if(tokens[index]=="@salto"){
                 break;
             }
+            ToLower(tokens[index+1]);
+            
             if(tokens.at(index)=="size"){
                 index++;
                 size = stoi(tokens.at(index));

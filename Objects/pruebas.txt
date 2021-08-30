@@ -1,8 +1,0 @@
-rmdisk -path =\Users\alexa\OneDrive\Desktop\Disco1.dk
-Mkdisk -Size=3000 -u=K -path=\Users\alexa\OneDrive\Desktop\Disco1.dk
-
-fdisk -Size=5 -path=\Users\alexa\OneDrive\Desktop\Disco1.dk -name=Particion1 
-fdisk -Size=5 -path=\Users\alexa\OneDrive\Desktop\Disco1.dk -name=Particion2
-fdisk -add=5 -path=\Users\alexa\OneDrive\Desktop\Disco1.dk -name=Particion2 -u=k
-fdisk -Size=5 -path=\Users\alexa\OneDrive\Desktop\Disco1.dk -name=Particion3
-
