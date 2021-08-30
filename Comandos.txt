@@ -2,4 +2,9 @@ Acceder a la carpeta desde ubuntu
 cd mnt/c/Users/alexa/OneDrive/Desktop/MIA-P1/Main
 
 Comando exec
-.\hola exec -path= \Users\alexa\OneDrive\Desktop\pruebas.txt
+sudo ./hola exec -path= /mnt/c/Users/alexa/OneDrive/Desktop/pruebas.txt
+
+
+Generar ejecutable
+
+g++ -o hola hola.cc
