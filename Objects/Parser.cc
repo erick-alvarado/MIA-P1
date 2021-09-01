@@ -35,7 +35,6 @@ class Parser{
     vector<Instruction> Parse(string text){
         txt = text;
         Split();
-        cout<<"etnro aui"<<endl;
         for(index = 0; index < tokens.size() ; index ++)
         {
             cout<<tokens[index]<<endl;
@@ -55,7 +54,6 @@ class Parser{
                     txt = str;
                     Reset();
                     Parse(txt);
-                    cout<<"Pasa";
                     break;
                 }
                 else
@@ -245,10 +243,8 @@ class Parser{
         replace(txt.begin(), txt.end(), '\r', ' ');
         txt.push_back(' ');
         cadena="";
-        cout<<txt<<endl;
         for(int i= 0; i<txt.size(); i++){
             linea+=txt[i];
-            cout<<"se ejecuta"<<txt.size()<<endl;
             if(txt[i]=='\n'){
                 lineas.push_back(linea);
                 Match();

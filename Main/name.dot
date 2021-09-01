@@ -1,0 +1,1 @@
+digraph D { A [shape=diamond] B [shape=box] C [shape=circle] A -> B [style=dashed, color=grey] }

@@ -1,5 +1,5 @@
 Acceder a la carpeta desde ubuntu
-cd mnt/c/Users/alexa/OneDrive/Desktop/MIA-P1/Main
+cd /mnt/c/Users/alexa/OneDrive/Desktop/MIA-P1/Main
 
 Comando exec
 sudo ./hola exec -path= /mnt/c/Users/alexa/OneDrive/Desktop/pruebas.txt
