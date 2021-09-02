@@ -11,7 +11,7 @@ Parser p;
 string s;
 vector<Instruction> instrucciones;
 Disk disco;
-vector<Mbr> mounts;
+
 void Exec(vector<Instruction> ins){
   for(int i =0; i<ins.size();i++){
     if(ins[i].comando=="mkdisk"){
@@ -35,7 +35,11 @@ void Exec(vector<Instruction> ins){
       continue;
     }
     if(ins[i].comando=="mount"){
-      mounts.push_back(disco.getMbr(ins[i].path));  
+      disco.mountPartition(ins[i].name,ins[i].path);
+      continue;
+    }
+    if(ins[i].comando=="unmount"){
+      disco.unmountPartition(ins[i].id);
       continue;
     }
     if(ins[i].comando=="rep"){

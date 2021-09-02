@@ -5,14 +5,89 @@
 #include <ctime>
 #include "../Disk/Mbr.cc"
 #include "../Disk/Space.cc"
-
+#include "Code.cc"
 using namespace std;
 
 
 class Disk{
     int disk_signature=0;
+    vector<Code> codes;
     //int mbr_size=136;
   public:
+    char intToAlphabet( int i )
+    {
+        return static_cast<char>('a' - 1 + i);
+    }
+    void mountPartition(string name, string path){
+        Mbr m = getMbr(path);
+        if(m.mbr_disk_signature!=0){
+            if(verifyMountedPartition(name)){
+                cout<<"Esta particion ya se encuentra montada:"<<name<<endl;
+                return;
+            }
+            Partition p = verifyPartitionExists(m.particiones,name);
+            if(p.part_fit=='-'){
+                cout<<"No se encuentra la particion:"<<name<<endl;
+                return;
+            }
+            int diskcode = m.mbr_disk_signature;
+            int partCount = getPartitionCount(diskcode);
+            Code c(diskcode,partCount,name,path,p);
+            codes.push_back(c);
+            printMounted();
+        }
+        
+    }
+    void printMounted(){
+        cout<<"Particiones montadas:"<<endl;
+        for(Code c:codes){
+            string id = "46"+to_string(c.disk_code)+intToAlphabet(c.partition_code);
+            cout<<c.path<<"  |  "<<c.name<<"  |  "<<id<<endl;
+        }
+    }
+
+    void unmountPartition(string id){
+        for(int i=0; i<codes.size();i++){
+            Code c = codes[i];
+            string id_ = "46"+to_string(c.disk_code)+intToAlphabet(c.partition_code);
+            if(id_==id){
+                cout<<"Partition unmounted:"<<id<<endl;
+                codes.erase(codes.begin()+i);
+                printMounted();
+                return;
+            }
+        }
+        cout<<"No se encontro montada la particion:"<<id<<endl;
+    }
+    bool verifyMountedPartition(string name){
+        for(Code c:codes){
+            if(c.name==name){
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    Partition verifyPartitionExists(Partition prts[4], string name){
+        for(int i = 0; i<4; i++){
+            if(prts[i].part_name==name){
+                return prts[i];
+            }
+        }
+        Partition p;
+        return p;
+    }
+    int getPartitionCount(int diskcode){
+        int num =1;
+        for(int i = 0; i<codes.size(); i++){
+            if(codes[i].disk_code==diskcode){
+                num++;
+            }
+        }
+        return num;
+    }
+
+
     //Metodos sobre el disco
     void CreateDisk(int size, string f, string u,string path){
         int size_=1024;
@@ -21,7 +96,7 @@ class Disk{
         }
         size_=size_*size;
         
-        disk_signature++;
+        disk_signature+=1;
         Mbr mbr;
         mbr.mbr_tamano=size_;
         mbr.mbr_fecha_creacion=time(0);
