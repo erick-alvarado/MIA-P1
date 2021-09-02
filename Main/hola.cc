@@ -43,12 +43,15 @@ void Exec(vector<Instruction> ins){
       continue;
     }
     if(ins[i].comando=="rep"){
-      cout<<ins[i].name<<endl;
-      cout<<ins[i].path<<endl;
-      cout<<ins[i].id<<endl;
 
       if(ins[i].name=="mbr"){
-        rep.getMbr(disco.getMbr(ins[i].path));
+        string path = disco.getPathFromId(ins[i].id);
+        if(path==""){
+          cout<<"No se encuentra montada la particion:"<<ins[i].id<<endl;
+          continue;
+        }
+
+        rep.getMbr(disco.getMbr(path),ins[i].path);
       }
     }
   }

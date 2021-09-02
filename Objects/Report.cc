@@ -9,7 +9,7 @@ class Report {
     public:
     
 
-    void getMbr(Mbr mbr){
+    void getMbr(Mbr mbr,string path){
         string dot = "digraph{ \n tbl[ \n shape=plaintext \n label=< \n <table border='0' cellborder='1' color='orange' cellspacing='0'> \n";
         
         dot+="<tr><td>Nombre</td><td>Valor</td></tr>\n";
@@ -37,11 +37,10 @@ class Report {
         }
 
         dot+="\n </table> \n >]; \n }";
-        g.GenerateGraph("MBR",dot);
+        g.GenerateGraph("MBR",path,dot);
     }
     void repDSK(Mbr mbr){
         string dot = "";
 
-        g.GenerateGraph("MBR",dot);
     }
 };

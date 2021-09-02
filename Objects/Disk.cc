@@ -18,6 +18,15 @@ class Disk{
     {
         return static_cast<char>('a' - 1 + i);
     }
+    string getPathFromId(string id){
+        for(Code c: codes){
+            if(id=="46"+to_string(c.disk_code)+intToAlphabet(c.partition_code)){
+                return c.path;
+            }
+        }
+        return "";
+        
+    }
     void mountPartition(string name, string path){
         Mbr m = getMbr(path);
         if(m.mbr_disk_signature!=0){
