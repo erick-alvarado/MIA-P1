@@ -9,7 +9,7 @@ class Graphviz {
         MyFile << dot_text;
         MyFile.close();
 
-        string com = "dot -Tpng "+ file_name +".dot -o graphviz.png";
+        string com = "dot -Tpng "+ file_name +".dot -o "+ file_name +".png";
         const char *cmd = com.c_str();
         system(cmd);
     }

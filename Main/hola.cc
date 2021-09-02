@@ -1,8 +1,12 @@
 #include <iostream>
 #include <fstream>
-using namespace std;
+
 #include "../Objects/Parser.cc"
 #include "../Objects/Disk.cc"
+#include "../Objects/Report.cc"
+
+using namespace std;
+Report rep;
 Parser p;
 string s;
 vector<Instruction> instrucciones;
@@ -33,6 +37,15 @@ void Exec(vector<Instruction> ins){
     if(ins[i].comando=="mount"){
       mounts.push_back(disco.getMbr(ins[i].path));  
       continue;
+    }
+    if(ins[i].comando=="rep"){
+      cout<<ins[i].name<<endl;
+      cout<<ins[i].path<<endl;
+      cout<<ins[i].id<<endl;
+
+      if(ins[i].name=="mbr"){
+        rep.getMbr(disco.getMbr(ins[i].path));
+      }
     }
   }
   

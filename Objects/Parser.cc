@@ -154,6 +154,24 @@ class Parser{
                 
                 continue;
             }
+            if(tokens.at(index)=="rep"){
+                Params();
+                if (name == ""){
+                    errores.push_back("REP: falta name");
+                    break;
+                }
+                if (path == ""){
+                    errores.push_back("REP: falta path");
+                    break;
+                }
+                if (id == ""){
+                    errores.push_back("REP: falta id");
+                    break;
+                }
+                rep();
+                
+                continue;
+            }
             if(tokens.at(index)=="@salto"){
                 continue;
             }
@@ -294,6 +312,14 @@ class Parser{
         linea="";
     }
     
+    void rep(){
+        Instruction ins;
+        ins.comando="rep";
+        ins.path = path;
+        ins.id = id;
+        ins.name = name;
+        instrucciones.push_back(ins);
+    }
     void mkdisk(){
         if(f_!="bf"&&f_!="ff"&& f_!="wf"){
             errores.push_back("MKDISK: valor de f incorrecto->"+f_);
