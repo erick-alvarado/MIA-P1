@@ -21,17 +21,20 @@ class Report {
         dot+="<tr><td>mbr_tamano</td><td>"+to_string(mbr.mbr_tamano)+ "</td></tr>\n";
         dot+="<tr><td>mbr_fecha_creacion</td><td>"+time_str+ "</td></tr>\n";
         dot+="<tr><td>mbr_disk_signature</td><td>"+to_string(mbr.mbr_disk_signature)+ "</td></tr>\n";
-        dot+="<tr><td>disk_fit</td><td>"+to_string(mbr.disk_fit)+ "</td></tr>\n";
+
+        string s;
+          s.push_back(mbr.disk_fit);
+        dot+="<tr><td>disk_fit</td><td>"+s+"</td></tr>\n";
         
         for(int i=0; i<4;i++){
             Partition p = mbr.particiones[i];
             if(p.part_type!='-'){
-                dot+="<tr><td>part_status"+to_string(i)+"</td><td>"+to_string(p.part_status)+ "</td></tr>\n";
-                dot+="<tr><td>part_type"+to_string(i)+"</td><td>"+to_string(p.part_type)+ "</td></tr>\n";
-                dot+="<tr><td>part_fit"+to_string(i)+"</td><td>"+to_string(p.part_fit)+ "</td></tr>\n";
-                dot+="<tr><td>part_start"+to_string(i)+"</td><td>"+to_string(p.part_start)+ "</td></tr>\n";
-                dot+="<tr><td>part_size"+to_string(i)+"</td><td>"+to_string(p.part_size)+ "</td></tr>\n";
-                dot+="<tr><td>part_name"+to_string(i)+"</td><td>"+p.part_name+ "</td></tr>\n";
+                dot+="<tr><td>part_status"+to_string(i+1)+"</td><td>"+p.part_status+ "</td></tr>\n";
+                dot+="<tr><td>part_type"+to_string(i+1)+"</td><td>"+p.part_type+ "</td></tr>\n";
+                dot+="<tr><td>part_fit"+to_string(i+1)+"</td><td>"+p.part_fit+ "</td></tr>\n";
+                dot+="<tr><td>part_start"+to_string(i+1)+"</td><td>"+to_string(p.part_start)+ "</td></tr>\n";
+                dot+="<tr><td>part_size"+to_string(i+1)+"</td><td>"+to_string(p.part_size)+ "</td></tr>\n";
+                dot+="<tr><td>part_name"+to_string(i+1)+"</td><td>"+p.part_name+ "</td></tr>\n";
             }
             
         }
@@ -39,7 +42,7 @@ class Report {
         dot+="\n </table> \n >]; \n }";
         g.GenerateGraph("MBR",path,dot);
     }
-    void repDSK(Mbr mbr){
+    void getDsk(Mbr mbr, string path){
         string dot = "";
 
     }

@@ -4,6 +4,7 @@
 #include <cstring>
 #include <ctime>
 #include "../Disk/Mbr.cc"
+#include "../Disk/Ebr.cc"
 #include "../Disk/Space.cc"
 #include "Code.cc"
 using namespace std;
@@ -14,6 +15,7 @@ class Disk{
     vector<Code> codes;
     //int mbr_size=136;
   public:
+  //Metodos de mount y unmount
     char intToAlphabet( int i )
     {
         return static_cast<char>('a' - 1 + i);
@@ -54,7 +56,6 @@ class Disk{
             cout<<c.path<<"  |  "<<c.name<<"  |  "<<id<<endl;
         }
     }
-
     void unmountPartition(string id){
         for(int i=0; i<codes.size();i++){
             Code c = codes[i];
@@ -76,7 +77,6 @@ class Disk{
         }
         return false;
     }
-    
     Partition verifyPartitionExists(Partition prts[4], string name){
         for(int i = 0; i<4; i++){
             if(prts[i].part_name==name){
@@ -141,6 +141,7 @@ class Disk{
         if(mbr.mbr_tamano==0){
             return;
         }
+        
         if(u=="k"){
             size = size*1024;
         }
@@ -220,9 +221,24 @@ class Disk{
         p.part_type=type[0];
         p.part_fit=f[0];
         p.part_size=size;
-        
+        p.part_start+=sizeof(mbr);
         strcpy (p.part_name, name.c_str());
         
+        //Crear particion extendida
+        if(p.part_type=='e'){
+           //Verificar que no exista una particion extendida
+            for(int i =0;i<4;i++){
+                if(mbr.particiones[i].part_type=='e'){
+                    cout<<"Ya existe una particion extendida";
+                    return;
+                }
+            }
+            Ebr ebr;
+            string nn = "Inicial";
+            strcpy (ebr.part_name, nn.c_str());
+            writeEbr(path,ebr,p.part_start);
+        }
+       
         selectPartition(mbr,p);
         writeMbr(path,mbr);
         
@@ -268,7 +284,42 @@ class Disk{
         //t = file.tellg();
         file.close();
     }
-    
+    //Metodos para obtener y escribir EBRs
+    Ebr getEbr(string path, int inicio){
+        Ebr ebr;
+        fstream file;
+        getFile_toRead(file,path);
+        if (!file){
+            cout << "Error al abrir el ebr:"+path<<endl;
+            return ebr;
+        }
+        file.seekp(inicio);
+        if (file.read((char *)&ebr, sizeof(ebr))){
+            cout << endl
+                 << endl;
+            cout << "Ebr cargado:"+path<<endl;
+        }
+        else{
+            cout << "Error al abrir el ebr:"+path<<endl;
+            return ebr;
+        }
+
+        file.close();
+        return ebr;
+    }
+    void writeEbr(string path, Ebr ebr, int inicio){
+        fstream file;
+        getFile_toWrite(file,path);
+        if (!file){
+            cout << "Error al crear el mbr:"+path<<endl;
+            return;
+        }
+        file.seekp(inicio);
+        file.write((char *)&ebr, sizeof(ebr));
+        file.close();
+        cout<<"Se escribio el mbr:"+path<<endl;
+    }
+
     //Metodos para obtener y escribir MBRs esto deberia ir en mbr pero sepa si se puede
     Mbr getMbr(string path){
         Mbr mbr;

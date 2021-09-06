@@ -7,19 +7,19 @@ digraph{
 <tr><td>mbr_tamano</td><td>3072000</td></tr>
 <tr><td>mbr_fecha_creacion</td><td>Thu Sep 02 15:01:53 2021</td></tr>
 <tr><td>mbr_disk_signature</td><td>1</td></tr>
-<tr><td>disk_fit</td><td>102</td></tr>
-<tr><td>part_status0</td><td>111</td></tr>
-<tr><td>part_type0</td><td>112</td></tr>
-<tr><td>part_fit0</td><td>102</td></tr>
-<tr><td>part_start0</td><td>0</td></tr>
-<tr><td>part_size0</td><td>5120</td></tr>
-<tr><td>part_name0</td><td>particion1</td></tr>
-<tr><td>part_status1</td><td>111</td></tr>
-<tr><td>part_type1</td><td>112</td></tr>
-<tr><td>part_fit1</td><td>102</td></tr>
-<tr><td>part_start1</td><td>5120</td></tr>
+<tr><td>disk_fit</td><td>f</td></tr>
+<tr><td>part_status1</td><td>o</td></tr>
+<tr><td>part_type1</td><td>p</td></tr>
+<tr><td>part_fit1</td><td>f</td></tr>
+<tr><td>part_start1</td><td>0</td></tr>
 <tr><td>part_size1</td><td>5120</td></tr>
-<tr><td>part_name1</td><td>particion2</td></tr>
+<tr><td>part_name1</td><td>particion1</td></tr>
+<tr><td>part_status2</td><td>o</td></tr>
+<tr><td>part_type2</td><td>p</td></tr>
+<tr><td>part_fit2</td><td>f</td></tr>
+<tr><td>part_start2</td><td>5120</td></tr>
+<tr><td>part_size2</td><td>5120</td></tr>
+<tr><td>part_name2</td><td>particion2</td></tr>
 
  </table> 
  >]; 

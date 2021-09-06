@@ -22,12 +22,12 @@ void Exec(vector<Instruction> ins){
       disco.CreatePartition(ins[i].size,ins[i].u_,ins[i].path,ins[i].type,ins[i].f_,ins[i].delete_,ins[i].name,ins[i].add);
       cout<<"--------------------"<<endl;
       Mbr m = disco.getMbr(ins[i].path);
-      cout<<m.particiones[0].part_name<<endl;
-      cout<<m.particiones[0].part_fit<<endl;
-      cout<<m.particiones[0].part_size<<endl;
-      cout<<m.particiones[0].part_start<<endl;
-      cout<<m.particiones[0].part_status<<endl;
-      cout<<m.particiones[0].part_type<<endl;
+      Ebr e = disco.getEbr(ins[i].path, m.particiones[0].part_start);
+      cout<<e.part_name<<endl;
+      cout<<e.part_fit<<endl;
+      cout<<e.part_size<<endl;
+      cout<<e.part_start<<endl;
+      cout<<e.part_status<<endl;
       continue;
     }
     if(ins[i].comando=="rmdisk"){
@@ -43,15 +43,17 @@ void Exec(vector<Instruction> ins){
       continue;
     }
     if(ins[i].comando=="rep"){
-
-      if(ins[i].name=="mbr"){
-        string path = disco.getPathFromId(ins[i].id);
-        if(path==""){
+      string path = disco.getPathFromId(ins[i].id);
+      if(path==""){
           cout<<"No se encuentra montada la particion:"<<ins[i].id<<endl;
           continue;
-        }
-
+      }
+      if(ins[i].name=="mbr"){
         rep.getMbr(disco.getMbr(path),ins[i].path);
+        continue;
+      }
+      if(ins[i].name=="disk"){
+        rep.getDsk(disco.getMbr(path),ins[i].path);
       }
     }
   }
