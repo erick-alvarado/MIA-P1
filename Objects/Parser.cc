@@ -181,8 +181,7 @@ class Parser{
             } 
             ResetParams();
         }
-        getError();
-
+        
         return instrucciones;
     }
     void Params(){

@@ -6,6 +6,7 @@
         "iterator": "cpp",
         "xstring": "cpp",
         "string": "cpp",
-        "ostream": "cpp"
+        "ostream": "cpp",
+        "algorithm": "cpp"
     }
 }

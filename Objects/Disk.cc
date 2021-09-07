@@ -122,7 +122,6 @@ class Disk{
         if(createFile(path)){
             writeMbr(path,mbr);
             resetFile(path,sizeof(mbr),size_-sizeof(mbr));
-            cout << "Archivo creado:"+path<<endl;
         }
     }
     
@@ -209,6 +208,7 @@ class Disk{
                 if(mbr.particiones[i].part_type=='e'){
                     extended = mbr.particiones[i];
                     ebr= getEbr(path,extended.part_start);
+                    break;
                 }
             }
             if(ebr.part_status=='-'){
@@ -217,36 +217,40 @@ class Disk{
             }
 
             //Obtenemos el ultimo ebr 
-            //Guardar el aterior auxiliar para ponerle la del siguiente
-            while(ebr.part_next!=-1){
-                ebr = getEbr(path,ebr.part_next);
+            //Guardar el anterior auxiliar para ponerle la del siguiente
+            
+            vector<Space> sp = getSpaces(ebr, extended.part_size, path, size);
+            if(sp.size()==0){
+                cout<<"Espacio insuficiente para crear la particion logica:"+name<<endl;
+                return;
+            }
+            if(extended.part_fit=='f'){
+                ebr.part_start= sp[0].start;
+            }
+            else if(extended.part_fit =='w'){
+                sort(sp.begin(), sp.end(), [](Space const & a, Space const & b) -> bool{ return a.size< b.size; } );
+                ebr.part_start=sp[0].start;
+            }
+            else if(extended.part_fit=='b'){
+                sort(sp.begin(), sp.end(), [](Space const & a, Space const & b) -> bool{ return a.size> b.size; } );
+                ebr.part_start=sp[0].start;
+            }
+            //Apuntar nodos correctos
+            Space s  = sp[0];
+            if(s.start_prev!=0){
+                Ebr anterior = getEbr(path,s.start_prev);
+                ebr.part_next= anterior.part_next;
+                anterior.part_next= s.start;
+                writeEbr(path,anterior,s.start_prev);
             }
 
-            int inicio_anterior=0;
-            if(ebr.part_start==0){
-                ebr.part_start=extended.part_start;
-            }
-            else{
-                inicio_anterior=ebr.part_start;
-                ebr.part_start= ebr.part_start+sizeof(ebr)+ ebr.part_size;
-            }
-            ebr.part_next=-1;
+            ebr.part_start= s.start;
             ebr.part_status='o';
             ebr.part_fit=f[0];
             ebr.part_size=size;
             strcpy (ebr.part_name, name.c_str());
 
-            if(ebr.part_start+ebr.part_size+sizeof(ebr)-1<=extended.part_start+extended.part_size){
-                writeEbr(path,ebr,ebr.part_start);
-            }
-            else{
-                cout<<"El tamaño de la logica a crear sobrepasa el tamaño de la particion"<<endl;
-            }
-            if(inicio_anterior!=0){
-                Ebr aux= getEbr(path,inicio_anterior);
-                aux.part_next= ebr.part_start;
-                writeEbr(path,aux,aux.part_start);
-            }
+            writeEbr(path,ebr,ebr.part_start);
             return;
         }    
 
@@ -287,6 +291,7 @@ class Disk{
             }
             Ebr ebr;
             ebr.part_status='o';
+            ebr.part_start = p.part_start;
             string nn = "Inicial";
             strcpy (ebr.part_name, nn.c_str());
             writeEbr(path,ebr,p.part_start);
@@ -318,7 +323,7 @@ class Disk{
             cout << "Error al crear el archivo:"+path<<endl;
             return false;
         }
-        cout<<"Se creo el archivo:"+path<<endl;
+        cout<<"Archivo creado:"+path<<endl;
         file.close();
         return true;
     }
@@ -348,9 +353,7 @@ class Disk{
         }
         file.seekp(inicio);
         if (file.read((char *)&ebr, sizeof(ebr))){
-            cout << endl
-                 << endl;
-            cout << "Ebr cargado:"+path<<endl;
+            
         }
         else{
             cout << "Error al abrir el ebr:"+path<<endl;
@@ -370,7 +373,6 @@ class Disk{
         file.seekp(inicio);
         file.write((char *)&ebr, sizeof(ebr));
         file.close();
-        cout<<"Se escribio el mbr:"+path<<endl;
     }
 
     //Metodos para obtener y escribir MBRs esto deberia ir en mbr pero sepa si se puede
@@ -384,9 +386,7 @@ class Disk{
         }
 
         if (file.read((char *)&mbr, sizeof(mbr))){
-            cout << endl
-                 << endl;
-            cout << "Mbr cargado:"+path<<endl;
+            
         }
         else{
             cout << "Error al abrir el mbr:"+path<<endl;
@@ -406,7 +406,6 @@ class Disk{
         file.seekp(0);
         file.write((char *)&mbr, sizeof(mbr));
         file.close();
-        cout<<"Se escribio el mbr:"+path<<endl;
     }
     void selectPartition(Mbr& mbr, Partition p){
         if(mbr.particiones[0].part_status=='f'){
@@ -501,4 +500,47 @@ class Disk{
         p.start=-1;
         return p;
     }
+
+    //Metodo para obtener espacios de ebr
+    vector<Space> getSpaces(Ebr ebr, int partition_size, string path, int size){
+        vector<Space> spaces;
+        Space space;
+        int initial_pos= ebr.part_start;
+        //Pushear entre inicio y el primero
+        //nvm nunca se borra la primera 
+
+        //Pushear los de por medio
+        Ebr aux;
+        
+        while(ebr.part_next!=-1){
+            aux = ebr;
+            ebr = getEbr(path,ebr.part_next);
+            space.size = ebr.part_start -(aux.part_start+aux.part_size+sizeof(aux)) ;
+            if(space.size>=size){
+                space.start=aux.part_start+aux.part_size+sizeof(aux);
+                space.start_prev=aux.part_start;
+                spaces.push_back(space);
+            }
+        }
+
+        //Pushear entre ultima y fin, o la opcion de que sea la inicial
+        int size_part = ebr.part_start+sizeof(ebr)+ebr.part_size;
+        if(size_part<partition_size){
+            space.size = partition_size -size_part ;
+            if(space.size>=size){
+                if(initial_pos==ebr.part_start && ebr.part_fit=='-'){
+                    space.start = ebr.part_start;
+                    space.start_prev=0;
+                }
+                else{
+                    space.start=size_part;
+                    space.start_prev=ebr.part_start;
+                }
+                spaces.push_back(space);
+            }
+        }
+
+        return spaces;
+    }
+
 };
