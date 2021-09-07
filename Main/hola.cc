@@ -26,6 +26,7 @@ void Exec(vector<Instruction> ins)
       disco.CreatePartition(ins[i].size, ins[i].u_, ins[i].path, ins[i].type, ins[i].f_, ins[i].delete_, ins[i].name, ins[i].add);
       cout << "--------------------" << endl;
       Mbr m = disco.getMbr(ins[i].path);
+      
       Ebr e = disco.getEbr(ins[i].path, m.particiones[0].part_start);
       while (e.part_next != -1)
       {

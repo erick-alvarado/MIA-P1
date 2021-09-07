@@ -148,15 +148,61 @@ class Disk{
             size = size*1024*1024;
         }
         if(delete_!=""){
+            //Verfica particiones en el mbr
             Partition& p = verifyPartition(name,mbr,temp);
+            
             if(p.part_size!=0){
                 if(delete_=="full"){
                     resetFile(path,p.part_start,p.part_size);
                 }
+                Partition temp;
                 p = temp;
-                cout<<"Se elimino la particion:"+name<<endl;
+                cout<<"Particion eliminada:"+name<<endl;
                 writeMbr(path,mbr);
+                return;
             }
+            //Verifica particiones en el extended si existe
+            Partition ext = getExtended(mbr);
+            if(ext.part_size!=0)
+            {
+                Ebr inicial = getEbr(path, ext.part_start);
+                Ebr actual = verifyEbr(name, inicial, path);
+                if (actual.part_status != '-')
+                {
+                    Ebr anterior;
+                    Ebr aux = inicial;
+                    while (aux.part_next != -1)
+                    {
+                        if (aux.part_start > aux.part_start)
+                        {
+                            break;
+                        }
+                        anterior = aux;
+                        aux = getEbr(path, aux.part_next);
+                    }
+
+                    if(anterior.part_status!='-'){
+                        anterior.part_next = actual.part_next;
+                        writeEbr(path,anterior,anterior.part_start);
+                    }
+                    if(ext.part_start!=actual.part_start){
+                        if(delete_=="full"){
+                            resetFile(path,actual.part_start,actual.part_size+sizeof(actual)-1);
+                        }
+                    }
+                    else{
+                        string nn = "Inicial";
+                        strcpy (actual.part_name, nn.c_str());
+                        actual.part_size=0;
+                        actual.part_status='-';
+                        actual.part_fit='-';
+                        writeEbr(path,actual,actual.part_start);
+                    }
+                    cout<<"Particion eliminada:"+name<<endl;
+                    return;
+                }
+            }
+            cout<<"Particion no existe:"<<name<<endl;
             return;
         }
         if(add!=-1){
@@ -166,8 +212,9 @@ class Disk{
             if(u=="m"){
                 add = add*1024*1024;
             }
+            Partition temp;
             cout<<to_string(add)<<endl;
-            Partition& p = verifyPartition(name,mbr,temp);
+            Partition& p = verifyPartition(name,mbr,p);
             if(p.part_size!=0){
                 if(add>=0){
                     vector<Space> v = getSpaces(mbr.mbr_tamano,mbr.particiones,add);
@@ -202,20 +249,13 @@ class Disk{
         //Crear particion logica
         if(type[0]=='l'){
             //Obtenemos la particion extendida si existe
-            Ebr ebr;
-            Partition extended;
-            for(int i =0;i<4;i++){
-                if(mbr.particiones[i].part_type=='e'){
-                    extended = mbr.particiones[i];
-                    ebr= getEbr(path,extended.part_start);
-                    break;
-                }
-            }
-            if(ebr.part_status=='-'){
+            Partition extended= getExtended(mbr);
+            if(extended.part_fit=='-'){
                 cout<<"No existe una particion extendida para almacenar las logica:"<<name<<endl;
                 return;
             }
-
+            Ebr ebr= getEbr(path,extended.part_start);
+            int aux_next=ebr.part_next;
             //Obtenemos el ultimo ebr 
             //Guardar el anterior auxiliar para ponerle la del siguiente
             
@@ -243,7 +283,9 @@ class Disk{
                 anterior.part_next= s.start;
                 writeEbr(path,anterior,s.start_prev);
             }
-
+            if(s.start==extended.part_start){
+                ebr.part_next= aux_next;
+            }
             ebr.part_start= s.start;
             ebr.part_status='o';
             ebr.part_fit=f[0];
@@ -254,9 +296,8 @@ class Disk{
             return;
         }    
 
-
-        //Crear particion primaria
         Partition p;
+        //Crear particion primaria
         vector<Space> sp = getSpaces(mbr.mbr_tamano,mbr.particiones,size);
         if(sp.size()==0){
             cout<<"Espacio insuficiente para crear la particion:"+name<<endl;
@@ -282,12 +323,11 @@ class Disk{
         
         //Crear particion extendida
         if(p.part_type=='e'){
-           //Verificar que no exista una particion extendida
-            for(int i =0;i<4;i++){
-                if(mbr.particiones[i].part_type=='e'){
-                    cout<<"Ya existe una particion extendida";
-                    return;
-                }
+            //Verificar que no exista una particion extendida
+            Partition extended= getExtended(mbr);
+            if(extended.part_type=='e'){
+                cout<<"Ya existe una particion extendida";
+                return;
             }
             Ebr ebr;
             ebr.part_status='o';
@@ -427,20 +467,25 @@ class Disk{
         cout<<"No se puede almacenar la particion:"+string(p.part_name)+" ya que el disco ya posee 4 particiones"<<endl;
     }
     Partition& verifyPartition(string name, Mbr &mbr, Partition &temp){
-        if(mbr.particiones[0].part_name==name){
-            return mbr.particiones[0];
+        for(int i = 0; i <4; i++){
+            if(mbr.particiones[i].part_name==name){
+                return mbr.particiones[i];
+            }
         }
-        if(mbr.particiones[1].part_name==name){
-            return mbr.particiones[1];
-        }
-        if(mbr.particiones[2].part_name==name){
-            return mbr.particiones[2];
-        }
-        if(mbr.particiones[3].part_name==name){
-            return mbr.particiones[3];
-        }
-        cout<<"No se puede eliminar la particion:"+name+" ya que no existe"<<endl;
         return temp;
+    }
+    Ebr verifyEbr(string name, Ebr ebr, string path){
+        if(ebr.part_name==name){
+            return ebr;
+        }
+        while(ebr.part_next!=-1){
+            if(ebr.part_name==name){
+                return ebr;
+            }
+            ebr = getEbr(path,ebr.part_next);
+        }
+        Ebr e;
+        return e;
     }
     //Metodos para obtener espacios y organizar las particiones
     Partition* Sort(Partition particiones[4]){
@@ -542,5 +587,17 @@ class Disk{
 
         return spaces;
     }
-
+    Partition getExtended(Mbr mbr)
+    {
+        
+        for (int i = 0; i < 4; i++)
+        {
+            if (mbr.particiones[i].part_type == 'e')
+            {
+                return mbr.particiones[i];
+            }
+        }
+        Partition p;
+        return  p;
+    }
 };
