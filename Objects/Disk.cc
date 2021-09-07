@@ -200,6 +200,58 @@ class Disk{
             return;
         }
         
+        //Crear particion logica
+        if(type[0]=='l'){
+            //Obtenemos la particion extendida si existe
+            Ebr ebr;
+            Partition extended;
+            for(int i =0;i<4;i++){
+                if(mbr.particiones[i].part_type=='e'){
+                    extended = mbr.particiones[i];
+                    ebr= getEbr(path,extended.part_start);
+                }
+            }
+            if(ebr.part_status=='-'){
+                cout<<"No existe una particion extendida para almacenar las logica:"<<name<<endl;
+                return;
+            }
+
+            //Obtenemos el ultimo ebr 
+            //Guardar el aterior auxiliar para ponerle la del siguiente
+            while(ebr.part_next!=-1){
+                ebr = getEbr(path,ebr.part_next);
+            }
+
+            int inicio_anterior=0;
+            if(ebr.part_start==0){
+                ebr.part_start=extended.part_start;
+            }
+            else{
+                inicio_anterior=ebr.part_start;
+                ebr.part_start= ebr.part_start+sizeof(ebr)+ ebr.part_size;
+            }
+            ebr.part_next=-1;
+            ebr.part_status='o';
+            ebr.part_fit=f[0];
+            ebr.part_size=size;
+            strcpy (ebr.part_name, name.c_str());
+
+            if(ebr.part_start+ebr.part_size+sizeof(ebr)-1<=extended.part_start+extended.part_size){
+                writeEbr(path,ebr,ebr.part_start);
+            }
+            else{
+                cout<<"El tamaño de la logica a crear sobrepasa el tamaño de la particion"<<endl;
+            }
+            if(inicio_anterior!=0){
+                Ebr aux= getEbr(path,inicio_anterior);
+                aux.part_next= ebr.part_start;
+                writeEbr(path,aux,aux.part_start);
+            }
+            return;
+        }    
+
+
+        //Crear particion primaria
         Partition p;
         vector<Space> sp = getSpaces(mbr.mbr_tamano,mbr.particiones,size);
         if(sp.size()==0){
@@ -234,6 +286,7 @@ class Disk{
                 }
             }
             Ebr ebr;
+            ebr.part_status='o';
             string nn = "Inicial";
             strcpy (ebr.part_name, nn.c_str());
             writeEbr(path,ebr,p.part_start);

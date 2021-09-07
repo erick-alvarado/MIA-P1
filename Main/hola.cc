@@ -23,11 +23,15 @@ void Exec(vector<Instruction> ins){
       cout<<"--------------------"<<endl;
       Mbr m = disco.getMbr(ins[i].path);
       Ebr e = disco.getEbr(ins[i].path, m.particiones[0].part_start);
-      cout<<e.part_name<<endl;
-      cout<<e.part_fit<<endl;
-      cout<<e.part_size<<endl;
-      cout<<e.part_start<<endl;
-      cout<<e.part_status<<endl;
+      while(e.part_next!=-1){
+          cout<<e.part_name<<endl;
+          cout<<e.part_fit<<endl;
+          cout<<e.part_size<<endl;
+          cout<<e.part_start<<endl;
+          cout<<e.part_next<<endl;
+          e = disco.getEbr(ins[i].path,e.part_next);
+      }
+      
       continue;
     }
     if(ins[i].comando=="rmdisk"){
