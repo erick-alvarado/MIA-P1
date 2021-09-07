@@ -23,6 +23,7 @@ void Exec(vector<Instruction> ins)
     }
     if (ins[i].comando == "fdisk")
     {
+      Instruction asdf = ins[i];
       disco.CreatePartition(ins[i].size, ins[i].u_, ins[i].path, ins[i].type, ins[i].f_, ins[i].delete_, ins[i].name, ins[i].add);
       cout << "--------------------" << endl;
       Mbr m = disco.getMbr(ins[i].path);

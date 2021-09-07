@@ -39,6 +39,7 @@ class Parser{
         {
             cout<<tokens[index]<<endl;
             ToLower(tokens[index]);
+            ResetParams();
             if(tokens.at(index)=="exec"){
                 Params();
                 if(path==""){

@@ -251,7 +251,7 @@ class Disk{
             //Obtenemos la particion extendida si existe
             Partition extended= getExtended(mbr);
             if(extended.part_fit=='-'){
-                cout<<"No existe una particion extendida para almacenar las logica:"<<name<<endl;
+                cout<<"Extendida no existente:"<<name<<endl;
                 return;
             }
             Ebr ebr= getEbr(path,extended.part_start);
@@ -261,7 +261,7 @@ class Disk{
             
             vector<Space> sp = getSpaces(ebr, extended.part_size, path, size);
             if(sp.size()==0){
-                cout<<"Espacio insuficiente para crear la particion logica:"+name<<endl;
+                cout<<"Espacio insuficiente:"+name<<endl;
                 return;
             }
             if(extended.part_fit=='f'){
