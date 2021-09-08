@@ -126,12 +126,18 @@ class Disk{
     }
     
     void DeleteDisk(string path){
-        if (remove( path.c_str() ) != 0){
-            cout<<"Error al borrar el archivo:"+path<<endl;
+        cout<<"Desea borrar el disco?[y/n]:";
+        string s;
+        cin>>s;
+        if(s=="y"){
+            if (remove( path.c_str() ) != 0){
+                cout<<"Error al borrar el archivo:"+path<<endl;
+            }
+            else{
+                cout<<"Archivo eliminado:"+path<<endl;
+            }
         }
-        else{
-            cout<<"Archivo eliminado:"+path<<endl;
-        }
+        
     }
     
     void CreatePartition(int size, string u, string path, string type, string f, string delete_, string name, int add){
