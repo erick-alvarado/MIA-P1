@@ -70,7 +70,7 @@ void Exec(vector<Instruction> ins)
       }
       if (ins[i].name == "mbr")
       {
-        rep.getMbr(disco.getMbr(path), ins[i].path);
+        rep.getMbr(path, ins[i].path);
         continue;
       }
       if (ins[i].name == "disk")

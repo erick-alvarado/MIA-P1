@@ -1,26 +1,93 @@
 digraph{ 
- tbl[ 
+tbl[ 
  shape=plaintext 
  label=< 
- <table border='0' cellborder='1' color='orange' cellspacing='0'> 
+ <table border='0' cellborder='1' color='black' cellspacing='0'> 
+<tr> <td bgcolor='grey' colspan='2'> MBR </td> </tr>
 <tr><td>Nombre</td><td>Valor</td></tr>
 <tr><td>mbr_tamano</td><td>3072000</td></tr>
-<tr><td>mbr_fecha_creacion</td><td>Thu Sep 02 15:01:53 2021</td></tr>
+<tr><td>mbr_fecha_creacion</td><td>Wed Sep 08 13:04:37 2021</td></tr>
 <tr><td>mbr_disk_signature</td><td>1</td></tr>
 <tr><td>disk_fit</td><td>f</td></tr>
+<tr><td>part_name1</td><td>particion</td></tr>
 <tr><td>part_status1</td><td>o</td></tr>
-<tr><td>part_type1</td><td>p</td></tr>
-<tr><td>part_fit1</td><td>f</td></tr>
-<tr><td>part_start1</td><td>0</td></tr>
+<tr><td>part_type1</td><td>e</td></tr>
+<tr><td>part_fit1</td><td>w</td></tr>
+<tr><td>part_start1</td><td>136</td></tr>
 <tr><td>part_size1</td><td>5120</td></tr>
-<tr><td>part_name1</td><td>particion1</td></tr>
+<tr><td>part_name2</td><td>particion1</td></tr>
 <tr><td>part_status2</td><td>o</td></tr>
 <tr><td>part_type2</td><td>p</td></tr>
-<tr><td>part_fit2</td><td>f</td></tr>
-<tr><td>part_start2</td><td>5120</td></tr>
+<tr><td>part_fit2</td><td>w</td></tr>
+<tr><td>part_start2</td><td>5392</td></tr>
 <tr><td>part_size2</td><td>5120</td></tr>
-<tr><td>part_name2</td><td>particion2</td></tr>
+<tr><td>part_name3</td><td>particion2</td></tr>
+<tr><td>part_status3</td><td>o</td></tr>
+<tr><td>part_type3</td><td>p</td></tr>
+<tr><td>part_fit3</td><td>w</td></tr>
+<tr><td>part_start3</td><td>10648</td></tr>
+<tr><td>part_size3</td><td>5120</td></tr>
 
  </table> 
  >]; 
- }
+ tbl1[ 
+ shape=plaintext 
+ label=< 
+ <table border='0' cellborder='1' color='black' cellspacing='0'> 
+<tr> <td bgcolor='grey' colspan='2'> EBR_1</td> </tr>
+<tr><td>Nombre</td><td>Valor</td></tr>
+<tr><td>part_name1</td><td>particion1</td></tr>
+<tr><td>part_status1</td><td>o</td></tr>
+<tr><td>part_fit1</td><td>w</td></tr>
+<tr><td>part_start1</td><td>136</td></tr>
+<tr><td>part_size1</td><td>1024</td></tr>
+<tr><td>part_next1</td><td>1192</td></tr>
+
+ </table> 
+ >]; 
+ tbl2[ 
+ shape=plaintext 
+ label=< 
+ <table border='0' cellborder='1' color='black' cellspacing='0'> 
+<tr> <td bgcolor='grey' colspan='2'> EBR_2</td> </tr>
+<tr><td>Nombre</td><td>Valor</td></tr>
+<tr><td>part_name2</td><td>particion2</td></tr>
+<tr><td>part_status2</td><td>o</td></tr>
+<tr><td>part_fit2</td><td>w</td></tr>
+<tr><td>part_start2</td><td>1192</td></tr>
+<tr><td>part_size2</td><td>1024</td></tr>
+<tr><td>part_next2</td><td>2248</td></tr>
+
+ </table> 
+ >]; 
+ tbl3[ 
+ shape=plaintext 
+ label=< 
+ <table border='0' cellborder='1' color='black' cellspacing='0'> 
+<tr> <td bgcolor='grey' colspan='2'> EBR_3</td> </tr>
+<tr><td>Nombre</td><td>Valor</td></tr>
+<tr><td>part_name3</td><td>particion3</td></tr>
+<tr><td>part_status3</td><td>o</td></tr>
+<tr><td>part_fit3</td><td>w</td></tr>
+<tr><td>part_start3</td><td>2248</td></tr>
+<tr><td>part_size3</td><td>1024</td></tr>
+<tr><td>part_next3</td><td>3304</td></tr>
+
+ </table> 
+ >]; 
+ tbl4[ 
+ shape=plaintext 
+ label=< 
+ <table border='0' cellborder='1' color='black' cellspacing='0'> 
+<tr> <td bgcolor='grey' colspan='2'> EBR_4</td> </tr>
+<tr><td>Nombre</td><td>Valor</td></tr>
+<tr><td>part_name4</td><td>particionnueva</td></tr>
+<tr><td>part_status4</td><td>o</td></tr>
+<tr><td>part_fit4</td><td>w</td></tr>
+<tr><td>part_start4</td><td>3304</td></tr>
+<tr><td>part_size4</td><td>1024</td></tr>
+<tr><td>part_next4</td><td>-1</td></tr>
+
+ </table> 
+ >]; 
+}
