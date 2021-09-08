@@ -173,7 +173,7 @@ class Disk{
                     Ebr aux = inicial;
                     while (aux.part_next != -1)
                     {
-                        if (aux.part_start > aux.part_start)
+                        if (aux.part_start == actual.part_start)
                         {
                             break;
                         }
@@ -475,14 +475,15 @@ class Disk{
         return temp;
     }
     Ebr verifyEbr(string name, Ebr ebr, string path){
-        if(ebr.part_name==name){
-            return ebr;
-        }
-        while(ebr.part_next!=-1){
+        
+        do{
             if(ebr.part_name==name){
                 return ebr;
             }
             ebr = getEbr(path,ebr.part_next);
+        } while(ebr.part_next!=-1);
+        if(ebr.part_name==name){
+            return ebr;
         }
         Ebr e;
         return e;
