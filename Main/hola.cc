@@ -27,7 +27,7 @@ void Exec(vector<Instruction> ins)
       disco.CreatePartition(ins[i].size, ins[i].u_, ins[i].path, ins[i].type, ins[i].f_, ins[i].delete_, ins[i].name, ins[i].add);
       cout << "--------------------" << endl;
       Mbr m = disco.getMbr(ins[i].path);
-      
+      /*
       Ebr e = disco.getEbr(ins[i].path, m.particiones[0].part_start);
       while (e.part_next != -1)
       {
@@ -42,7 +42,7 @@ void Exec(vector<Instruction> ins)
       cout << e.part_start << endl;
       cout << e.part_size << endl;
       cout << e.part_next << endl;
-      cout << e.part_fit << endl;
+      cout << e.part_fit << endl;*/
       continue;
     }
     if (ins[i].comando == "rmdisk")

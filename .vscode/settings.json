@@ -7,6 +7,7 @@
         "xstring": "cpp",
         "string": "cpp",
         "ostream": "cpp",
-        "algorithm": "cpp"
+        "algorithm": "cpp",
+        "xutility": "cpp"
     }
 }

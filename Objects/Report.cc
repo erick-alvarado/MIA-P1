@@ -95,9 +95,25 @@ class Report {
         string values = "<tr>";
 
         titles+="<td rowspan='3'>MBR</td>\n";
+        //Spaces particiones MBR
+        vector<Space> sp = d.getSpaces(mbr.mbr_tamano, mbr.particiones,0);
+
+        for(Space s:sp){
+            cout<<s.start<<endl;
+        }
+
+
+        sort(sp.begin(), sp.end(), [](Space const & a, Space const & b) -> bool{ return a.size> b.size; } );
+
+
 
         for(int i =0; i<4; i++){
             Partition p = mbr.particiones[i];
+            if(sp[0].start<p.part_start){
+                titles+="<td rowspan='1'>Libre</td>\n";
+                values+="<td>"+to_string(sp[0].size+sizeof(Mbr))+"</td>\n";
+                sp.erase(sp.begin());
+            }
             if(p.part_type=='e'){
                 ebr+="<tr>\n";
                 int colspan =0;
@@ -157,21 +173,17 @@ class Report {
             else{
                 double size = p.part_size;
                 if(p.part_status=='o'){
-                    titles+="<td rowspan='2'>Primaria</td>\n";
-
+                    titles+="<td rowspan='1'>Primaria</td>\n";
+                    values+="<td>"+to_string(size)+"</td>\n";
                 }
-                else{
-                    titles+="<td rowspan='2'>Libre</td>\n";
-                    if(i==3){
-                        size =sizeof(Mbr)+ mbr.mbr_tamano-(mbr.particiones[2].part_start+mbr.particiones[2].part_size);
-                    }
-                }
-                values+="<td>"+to_string(size)+"</td>\n";
             }
-            
         }
 
-
+        if(sp.size() >0){
+                titles+="<td rowspan='1'>Libre</td>\n";
+                values+="<td>"+to_string(sp[0].size+sizeof(Mbr))+"</td>\n";
+                sp.erase(sp.begin());
+            }
 
 
         titles+="</tr>\n";
