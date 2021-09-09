@@ -7,4 +7,5 @@ class Space{
     int start;
     int size;
     int start_prev;
+    string name="";
 };

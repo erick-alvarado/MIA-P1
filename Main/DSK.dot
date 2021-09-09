@@ -5,17 +5,13 @@ digraph test {
  <table color='grey' border='1' cellborder='1' cellspacing='5'> 
  <tr>
 <td rowspan='3'>MBR</td>
-<td rowspan='1'>Libre</td>
-<td rowspan='1'>Primaria</td>
-<td rowspan='1'>Primaria</td>
-<td rowspan='1'>Primaria</td>
-<td rowspan='1'>Libre</td>
+<td rowspan='1'>Primary</td>
+<td rowspan='1'>Primary</td>
+<td rowspan='1'>Unoccupied</td>
 </tr>
-<tr><td>4368</td>
-<td>2048.000000</td>
-<td>2048.000000</td>
-<td>2048.000000</td>
-<td>4096</td>
+<tr><td>2048</td>
+<td>2048</td>
+<td>6144</td>
 </tr>
 </table>
  >]; 

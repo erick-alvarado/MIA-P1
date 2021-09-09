@@ -320,13 +320,16 @@ class Disk{
             sort(sp.begin(), sp.end(), [](Space const & a, Space const & b) -> bool{ return a.size> b.size; } );
             p.part_start=sp[0].start;
         }
+
+        for(Space s:sp){
+            cout<<s.start<<endl;
+        }
+
+
         p.part_status='o';
         p.part_type=type[0];
         p.part_fit=f[0];
         p.part_size=size;
-        if(mbr.particiones[0].part_fit=='-'){
-            p.part_start+=sizeof(mbr);
-        }
         strcpy (p.part_name, name.c_str());
         
         //Crear particion extendida
@@ -501,33 +504,41 @@ class Disk{
         sort(particiones, particiones + 4, [](Partition const & a, Partition const & b) -> bool{ return a.part_start > b.part_start; } );
         return particiones;
     };
-    vector<Space> getSpaces(int mbr_tamano, Partition particiones[4],int size){
+    vector<Space> getSpaces(int mbr_size, Partition particiones[4],int size){
         vector<Space> spaces;
         vector<Partition> v;
         Space temp;
         int space;
      
-        for(int i = 0; i<3; i++){
+        for(int i = 0; i<4; i++){
             if(particiones[i].part_status=='o'){
                 v.push_back(particiones[i]);
             }
         }
+
+        sort(v.begin(), v.end(), [](Partition const & a, Partition const & b) -> bool{ return a.part_start< b.part_start; } );
+
+        //Si contiene particiones
         if(v.size()>0){
-            space = particiones[0].part_start;
+            //Espacio inicio a primer particion
+            
+            space = v[0].part_start-sizeof(Mbr)-1;
             if(space>=size){
-                temp.start=0;
+                temp.start=sizeof(Mbr);
                 temp.size=space;
                 spaces.push_back(temp);
             }
-            for(int i = 0; i<3; i++){
-                space = particiones[i+1].part_start-particiones[i].part_start-particiones[i].part_size;
+            //Espacios entre particiones
+            for(int i = 0; i<v.size()-1;i++){
+                space = v[i+1].part_start -(v[i].part_start+v[i].part_size);
                 if(space>=size){
                     temp.size=space;
-                    temp.start = particiones[i].part_start+particiones[i].part_size;
+                    temp.start = v[i].part_start+v[i].part_size;
                     spaces.push_back(temp);
                 }
             }
-            space=mbr_tamano-v[v.size()-1].part_start-v[v.size()-1].part_size;
+            //Espacios al final
+            space=mbr_size-v[v.size()-1].part_start-v[v.size()-1].part_size+sizeof(Mbr);
             if(space>=size){
                 temp.size=space;
                 temp.start= v[v.size()-1].part_start+v[v.size()-1].part_size;
@@ -535,10 +546,10 @@ class Disk{
             }
         }
         else{
-            space = mbr_tamano;
+            space = mbr_size;
             if(space>=size){
                 temp.size=space;
-                temp.start=0;
+                temp.start=sizeof(Mbr);
                 spaces.push_back(temp);
             }
         }
@@ -576,11 +587,12 @@ class Disk{
                 spaces.push_back(space);
             }
         }
+        //Espacio entre inicial
 
         //Pushear entre ultima y fin, o la opcion de que sea la inicial
         int size_part = ebr.part_start+ebr.part_size;
         if(size_part<partition_size){
-            space.size = partition_size -size_part ;
+            space.size = partition_size+sizeof(Mbr) -size_part ;
             if(space.size>=size){
                 if(initial_pos==ebr.part_start && ebr.part_fit=='-'){
                     space.start = ebr.part_start;

@@ -96,94 +96,80 @@ class Report {
 
         titles+="<td rowspan='3'>MBR</td>\n";
         //Spaces particiones MBR
-        vector<Space> sp = d.getSpaces(mbr.mbr_tamano, mbr.particiones,0);
+        vector<Space> sp = d.getSpaces(mbr.mbr_tamano,mbr.particiones,1);
+        for(Partition p: mbr.particiones){
+            if(p.part_status=='o'){
+                Space space;
+                if(p.part_type=='e'){
+                    space.name="ext$";
+                }
+                else{
+                    space.name="Primary";
+                }
+                space.start=p.part_start;
+                space.size= p.part_size;
+                sp.push_back(space);
+            }
+            
+        }        
+        sort(sp.begin(), sp.end(), [](Space const & a, Space const & b) -> bool{ return a.start< b.start; } );
+        
 
         for(Space s:sp){
-            cout<<s.start<<endl;
-        }
-
-
-        sort(sp.begin(), sp.end(), [](Space const & a, Space const & b) -> bool{ return a.size> b.size; } );
-
-
-
-        for(int i =0; i<4; i++){
-            Partition p = mbr.particiones[i];
-            if(sp[0].start<p.part_start){
-                titles+="<td rowspan='1'>Libre</td>\n";
-                values+="<td>"+to_string(sp[0].size+sizeof(Mbr))+"</td>\n";
-                sp.erase(sp.begin());
-            }
-            if(p.part_type=='e'){
-                ebr+="<tr>\n";
-                int colspan =0;
-                Ebr e = d.getEbr(path_mbr,p.part_start);
-                while(e.part_next!=-1){
-                    ebr+="<td rowspan ='2'>Ebr</td>\n";
-                    double size = e.part_size;
-                    if(e.part_status!='-'){
-                        ebr+="<td>Logica</td>\n";
-                        values+="<td>"+to_string(size)+"</td>\n";
-                        if(e.part_start+e.part_size!=e.part_next ){
-                            ebr+="<td>Libre</td>\n";
-                            if(e.part_next==-1){
-                                size =sizeof(Mbr)+  p.part_size-(e.part_start+e.part_size);
-                            }
-                            else{
-                                size = e.part_next-(e.part_start+e.part_size);
-                            }
-                            values+="<td>"+to_string(size)+"</td>\n";
-                            colspan++;
-                        }
-                    }
-                    else{
-                        ebr+="<td>Libre</td>\n";
-                        size = e.part_next-e.part_start;
-                        values+="<td>"+to_string(size)+"</td>\n";
-                    }
-                    colspan+=2;
-                    e = d.getEbr(path_mbr,e.part_next);
+            if(s.name=="ext$"){
+                int colspan = 2;
+                Ebr e = d.getEbr(path_mbr,s.start);
+                vector<Space> sp_ebr = d.getSpaces(e, s.size, path_mbr, 1);
+                for(Space s:sp_ebr){
+                    cout<<s.start<<"-"<<to_string(s.size)<<endl;
                 }
-                ebr+="<td rowspan ='2'>Ebr</td>\n";
-                    double size = e.part_size;
-                    if(e.part_status!='-'){
-                        ebr+="<td>Logica</td>\n";
-                        values+="<td>"+to_string(size)+"</td>\n";
-                        if(e.part_start+e.part_size!=e.part_next ){
-                            ebr+="<td>Libre</td>\n";
-                            if(e.part_next==-1){
-                                size =sizeof(Mbr)+ p.part_size-(e.part_start+e.part_size);
-                            }
-                            else{
-                                size = e.part_next-(e.part_start+e.part_size);
-                            }
-                            values+="<td>"+to_string(size)+"</td>\n";
-                            colspan++;
-                        }
-                    }
-                    else{
-                        ebr+="<td>Libre</td>\n";
-                        size = e.part_next-e.part_start;
-                        values+="<td>"+to_string(size)+"</td>\n";
-                    }
+                //Obtener espacios y ebrs
+                while(e.part_next!=-1){
+                    Space space;
+                    space.name="Logic";
+                    space.size=e.part_size;
+                    space.start= e.part_start;
+                    sp_ebr.push_back(space);
+
                     colspan+=2;
-                titles+="<td colspan='"+to_string(colspan)+"'>Extended</td>\n";
-                ebr+="</tr>\n";
+                    e= d.getEbr(path_mbr,e.part_next);
+                }
+                Space space;
+                space.name = "Logic";
+                space.size = e.part_size;
+                space.start = e.part_start;
+                sp_ebr.push_back(space);
+
+                sort(sp_ebr.begin(), sp_ebr.end(), [](Space const & a, Space const & b) -> bool{ return a.start< b.start; } );
+
+
+                ebr+="<tr>";
+                for(Space x: sp_ebr){
+                    if(x.name=="Logic"){
+                        ebr+="<td rowspan ='2'>Ebr</td>\n";
+                    }
+                    else if(x.name==""){
+                        x.name = "Unoccupied";
+                    }
+                    if(x.name=="Unoccupied"){
+                        colspan++;
+                    }
+                    ebr+="<td>"+x.name+"</td>\n";
+                    values+="<td>"+to_string(x.size)+"</td>\n";
+                }
+                ebr+="</tr>";
+
+                titles += "<td colspan='" + to_string(colspan) + "'> EXT </td>\n";
             }
             else{
-                double size = p.part_size;
-                if(p.part_status=='o'){
-                    titles+="<td rowspan='1'>Primaria</td>\n";
-                    values+="<td>"+to_string(size)+"</td>\n";
+                if(s.name==""){
+                    s.name="Unoccupied";
                 }
+                titles+="<td rowspan='1'>"+s.name+"</td>\n";
+                values+="<td>"+to_string(s.size)+"</td>\n";
+
             }
         }
-
-        if(sp.size() >0){
-                titles+="<td rowspan='1'>Libre</td>\n";
-                values+="<td>"+to_string(sp[0].size+sizeof(Mbr))+"</td>\n";
-                sp.erase(sp.begin());
-            }
 
 
         titles+="</tr>\n";

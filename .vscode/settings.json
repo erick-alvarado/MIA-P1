@@ -8,6 +8,7 @@
         "string": "cpp",
         "ostream": "cpp",
         "algorithm": "cpp",
-        "xutility": "cpp"
+        "xutility": "cpp",
+        "initializer_list": "cpp"
     }
 }
