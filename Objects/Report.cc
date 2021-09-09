@@ -120,9 +120,7 @@ class Report {
                 int colspan = 2;
                 Ebr e = d.getEbr(path_mbr,s.start);
                 vector<Space> sp_ebr = d.getSpaces(e, s.size, path_mbr, 1);
-                for(Space s:sp_ebr){
-                    cout<<s.start<<"-"<<to_string(s.size)<<endl;
-                }
+                
                 //Obtener espacios y ebrs
                 while(e.part_next!=-1){
                     if(e.part_status!='-'){

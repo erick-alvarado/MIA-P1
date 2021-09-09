@@ -321,9 +321,7 @@ class Disk{
             p.part_start=sp[0].start;
         }
 
-        for(Space s:sp){
-            cout<<s.start<<endl;
-        }
+       
 
 
         p.part_status='o';

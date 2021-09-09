@@ -25,24 +25,6 @@ void Exec(vector<Instruction> ins)
     {
       Instruction asdf = ins[i];
       disco.CreatePartition(ins[i].size, ins[i].u_, ins[i].path, ins[i].type, ins[i].f_, ins[i].delete_, ins[i].name, ins[i].add);
-      cout << "--------------------" << endl;
-      Mbr m = disco.getMbr(ins[i].path);
-      /*
-      Ebr e = disco.getEbr(ins[i].path, m.particiones[0].part_start);
-      while (e.part_next != -1)
-      {
-        cout << e.part_name << endl;
-        cout << e.part_start << endl;
-        cout << e.part_size << endl;
-        cout << e.part_next << endl;
-        cout << e.part_fit << endl;
-        e = disco.getEbr(ins[i].path, e.part_next);
-      }
-      cout << e.part_name << endl;
-      cout << e.part_start << endl;
-      cout << e.part_size << endl;
-      cout << e.part_next << endl;
-      cout << e.part_fit << endl;*/
       continue;
     }
     if (ins[i].comando == "rmdisk")
@@ -60,6 +42,18 @@ void Exec(vector<Instruction> ins)
       disco.unmountPartition(ins[i].id);
       continue;
     }
+    if (ins[i].comando == "pause")
+    {
+      cout<<"Press to continue:";
+      string s;
+      cin>>s;
+      cout<<endl;
+      continue;
+    }
+    if (ins[i].name == "mkfs")
+    {
+        continue;
+    }
     if (ins[i].comando == "rep")
     {
       string path = disco.getPathFromId(ins[i].id);
@@ -73,6 +67,7 @@ void Exec(vector<Instruction> ins)
         rep.getMbr(path, ins[i].path);
         continue;
       }
+      
       if (ins[i].name == "disk")
       {
         rep.getDsk(path, ins[i].path);
@@ -98,7 +93,7 @@ int main(int argc, char *argv[])
     }
   }
   //Pa pruebas windows
-  s = "exec -path= \\Users\\alexa\\OneDrive\\Desktop\\pruebas.txt";
+  //s = "exec -path= \\Users\\alexa\\OneDrive\\Desktop\\pruebas.txt";
 
   //Parse
   instrucciones = p.Parse(s);

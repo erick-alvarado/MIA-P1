@@ -37,7 +37,6 @@ class Parser{
         Split();
         for(index = 0; index < tokens.size() ; index ++)
         {
-            cout<<tokens[index]<<endl;
             ToLower(tokens[index]);
             ResetParams();
             if(tokens.at(index)=="exec"){
@@ -155,6 +154,7 @@ class Parser{
                 
                 continue;
             }
+            
             if(tokens.at(index)=="rep"){
                 Params();
                 if (name == ""){
@@ -171,6 +171,12 @@ class Parser{
                 }
                 rep();
                 
+                continue;
+            }
+            if(tokens.at(index)=="pause"){
+                Instruction i;
+                i.comando="pause";
+                instrucciones.push_back(i);
                 continue;
             }
             if(tokens.at(index)=="@salto"){
