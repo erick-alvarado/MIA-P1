@@ -125,13 +125,15 @@ class Report {
                 }
                 //Obtener espacios y ebrs
                 while(e.part_next!=-1){
-                    Space space;
-                    space.name="Logic";
-                    space.size=e.part_size;
-                    space.start= e.part_start;
-                    sp_ebr.push_back(space);
+                    if(e.part_status!='-'){
+                        Space space;
+                        space.name="Logic";
+                        space.size=e.part_size;
+                        space.start= e.part_start;
+                        sp_ebr.push_back(space);
 
-                    colspan+=2;
+                        colspan+=2;
+                    }
                     e= d.getEbr(path_mbr,e.part_next);
                 }
                 Space space;
