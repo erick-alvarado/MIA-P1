@@ -75,7 +75,7 @@ void Exec(vector<Instruction> ins)
       }
       if (ins[i].name == "disk")
       {
-        rep.getDsk(disco.getMbr(path), ins[i].path);
+        rep.getDsk(path, ins[i].path);
       }
     }
   }

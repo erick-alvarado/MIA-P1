@@ -1,0 +1,34 @@
+digraph test {
+ parent [ 
+ shape=plaintext 
+ label=< 
+ <table color='grey' border='1' cellborder='1' cellspacing='5'> 
+ <tr>
+<td rowspan='3'>MBR</td>
+<td colspan='8'>Extended</td>
+<td rowspan='2'>Primaria</td>
+<td rowspan='2'>Primaria</td>
+<td rowspan='2'>Libre</td>
+</tr>
+<tr>
+<td rowspan ='2'>Ebr</td>
+<td>Libre</td>
+<td rowspan ='2'>Ebr</td>
+<td>Logica</td>
+<td>Libre</td>
+<td rowspan ='2'>Ebr</td>
+<td>Logica</td>
+<td>Libre</td>
+</tr>
+<tr><td>1024.000000</td>
+<td>1024.000000</td>
+<td>1024.000000</td>
+<td>1024.000000</td>
+<td>1024.000000</td>
+<td>2048.000000</td>
+<td>2048.000000</td>
+<td>1024.000000</td>
+</tr>
+</table>
+ >]; 
+ }

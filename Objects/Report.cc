@@ -12,6 +12,9 @@ class Report {
 
     void getMbr(string path_mbr,string path_file){
         Mbr mbr = d.getMbr(path_mbr);
+        if(mbr.mbr_tamano!=0){
+            return;
+        }
         string dot = "digraph{ \n";
         dot+= "tbl[ \n shape=plaintext \n label=< \n <table border='0' cellborder='1' color='black' cellspacing='0'> \n";
         dot+="<tr> <td bgcolor='grey' colspan='2'> MBR </td> </tr>\n";
@@ -79,7 +82,106 @@ class Report {
         g.GenerateGraph("MBR",path_file,dot);
     }
     void getDsk(string path_mbr,string path_file){
-        string dot = "";
+        Mbr mbr = d.getMbr(path_mbr);
+        
+        if(mbr.mbr_tamano==0){
+            return;
+        }
+
+
+        string dot = "digraph test {\n parent [ \n shape=plaintext \n label=< \n <table color='grey' border='1' cellborder='1' cellspacing='5'> \n ";
+        string titles ="<tr>\n";
+        string ebr = "";
+        string values = "<tr>";
+
+        titles+="<td rowspan='3'>MBR</td>\n";
+
+        for(int i =0; i<4; i++){
+            Partition p = mbr.particiones[i];
+            if(p.part_type=='e'){
+                ebr+="<tr>\n";
+                int colspan =0;
+                Ebr e = d.getEbr(path_mbr,p.part_start);
+                while(e.part_next!=-1){
+                    ebr+="<td rowspan ='2'>Ebr</td>\n";
+                    double size = e.part_size;
+                    if(e.part_status!='-'){
+                        ebr+="<td>Logica</td>\n";
+                        values+="<td>"+to_string(size)+"</td>\n";
+                        if(e.part_start+e.part_size!=e.part_next ){
+                            ebr+="<td>Libre</td>\n";
+                            if(e.part_next==-1){
+                                size =sizeof(Mbr)+  p.part_size-(e.part_start+e.part_size);
+                            }
+                            else{
+                                size = e.part_next-(e.part_start+e.part_size);
+                            }
+                            values+="<td>"+to_string(size)+"</td>\n";
+                            colspan++;
+                        }
+                    }
+                    else{
+                        ebr+="<td>Libre</td>\n";
+                        size = e.part_next-e.part_start;
+                        values+="<td>"+to_string(size)+"</td>\n";
+                    }
+                    colspan+=2;
+                    e = d.getEbr(path_mbr,e.part_next);
+                }
+                ebr+="<td rowspan ='2'>Ebr</td>\n";
+                    double size = e.part_size;
+                    if(e.part_status!='-'){
+                        ebr+="<td>Logica</td>\n";
+                        values+="<td>"+to_string(size)+"</td>\n";
+                        if(e.part_start+e.part_size!=e.part_next ){
+                            ebr+="<td>Libre</td>\n";
+                            if(e.part_next==-1){
+                                size =sizeof(Mbr)+ p.part_size-(e.part_start+e.part_size);
+                            }
+                            else{
+                                size = e.part_next-(e.part_start+e.part_size);
+                            }
+                            values+="<td>"+to_string(size)+"</td>\n";
+                            colspan++;
+                        }
+                    }
+                    else{
+                        ebr+="<td>Libre</td>\n";
+                        size = e.part_next-e.part_start;
+                        values+="<td>"+to_string(size)+"</td>\n";
+                    }
+                    colspan+=2;
+                titles+="<td colspan='"+to_string(colspan)+"'>Extended</td>\n";
+                ebr+="</tr>\n";
+            }
+            else{
+                double size = p.part_size;
+                if(p.part_status=='o'){
+                    titles+="<td rowspan='2'>Primaria</td>\n";
+
+                }
+                else{
+                    titles+="<td rowspan='2'>Libre</td>\n";
+                    if(i==3){
+                        size =sizeof(Mbr)+ mbr.mbr_tamano-(mbr.particiones[2].part_start+mbr.particiones[2].part_size);
+                    }
+                }
+                values+="<td>"+to_string(size)+"</td>\n";
+            }
+            
+        }
+
+
+
+
+        titles+="</tr>\n";
+        values+="</tr>\n";
+
+        dot+=titles;
+        dot+=ebr;
+        dot+=values;
+        dot+="</table>\n >]; \n }";
+        g.GenerateGraph("DSK",path_file,dot);
 
     }
 };

@@ -193,7 +193,7 @@ class Disk{
                     }
                     if(ext.part_start!=actual.part_start){
                         if(delete_=="full"){
-                            resetFile(path,actual.part_start,actual.part_size+sizeof(actual)-1);
+                            resetFile(path,actual.part_start,actual.part_size-1);
                         }
                     }
                     else{
@@ -324,7 +324,9 @@ class Disk{
         p.part_type=type[0];
         p.part_fit=f[0];
         p.part_size=size;
-        p.part_start+=sizeof(mbr);
+        if(mbr.particiones[0].part_fit=='-'){
+            p.part_start+=sizeof(mbr);
+        }
         strcpy (p.part_name, name.c_str());
         
         //Crear particion extendida
@@ -567,16 +569,16 @@ class Disk{
         while(ebr.part_next!=-1){
             aux = ebr;
             ebr = getEbr(path,ebr.part_next);
-            space.size = ebr.part_start -(aux.part_start+aux.part_size+sizeof(aux)) ;
+            space.size = ebr.part_start -(aux.part_start+aux.part_size) ;
             if(space.size>=size){
-                space.start=aux.part_start+aux.part_size+sizeof(aux);
+                space.start=aux.part_start+aux.part_size;
                 space.start_prev=aux.part_start;
                 spaces.push_back(space);
             }
         }
 
         //Pushear entre ultima y fin, o la opcion de que sea la inicial
-        int size_part = ebr.part_start+sizeof(ebr)+ebr.part_size;
+        int size_part = ebr.part_start+ebr.part_size;
         if(size_part<partition_size){
             space.size = partition_size -size_part ;
             if(space.size>=size){
